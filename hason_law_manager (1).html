@@ -1,0 +1,994 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>מערכת ניהול | חסון עורכי דין</title>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --gold:#C9A84C;--gold-light:#E8C97A;--gold-dim:rgba(201,168,76,0.12);
+  --dark:#1A1814;--dark2:#221F1A;--dark3:#2D2923;
+  --border:rgba(201,168,76,0.2);--border-light:rgba(201,168,76,0.08);
+  --text:#E8E4DC;--text-dim:#9A9080;--text-dimmer:#5A5550;
+  --green:#4CAF7A;--green-dim:rgba(76,175,122,0.12);
+  --red:#E05555;--red-dim:rgba(224,85,85,0.1);
+  --blue:#5B9BD5;--blue-dim:rgba(91,155,213,0.1);
+  --amber:#E8A83A;--amber-dim:rgba(232,168,58,0.1);
+  --purple:#9B7BD5;--purple-dim:rgba(155,123,213,0.12);
+  --teal:#4CBFAF;--teal-dim:rgba(76,191,175,0.12);
+}
+body{font-family:'Heebo',sans-serif;background:var(--dark);color:var(--text);height:100vh;direction:rtl;font-size:14px;overflow:hidden}
+
+/* TOP NAV */
+.top-nav{background:var(--dark2);border-bottom:1px solid var(--border);padding:0 20px;display:flex;align-items:center;height:52px;flex-shrink:0}
+.nav-brand{font-size:14px;font-weight:700;color:var(--gold);margin-left:28px;white-space:nowrap;letter-spacing:0.3px}
+.nav-tabs{display:flex;gap:0;flex:1;overflow-x:auto}
+.nav-tabs::-webkit-scrollbar{height:0}
+.nav-tab{padding:0 18px;height:52px;display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text-dim);cursor:pointer;border-bottom:3px solid transparent;transition:all 0.2s;white-space:nowrap;font-weight:400}
+.nav-tab:hover{color:var(--text);background:rgba(255,255,255,0.02)}
+.nav-tab.active{color:var(--gold);border-bottom-color:var(--gold);font-weight:600}
+.tab-badge{background:var(--gold-dim);color:var(--gold);border-radius:10px;padding:1px 7px;font-size:11px;font-weight:700}
+.nav-right{display:flex;align-items:center;gap:10px;margin-right:auto}
+.nav-search{background:var(--dark3);border:1px solid var(--border);border-radius:6px;padding:6px 12px;color:var(--text);font-size:12px;font-family:'Heebo',sans-serif;outline:none;direction:rtl;width:180px}
+.nav-search::placeholder{color:var(--text-dimmer)}
+
+/* LAYOUT */
+.app-body{display:flex;height:calc(100vh - 52px)}
+.module{display:none;width:100%;height:100%}
+.module.active{display:flex}
+
+/* DASHBOARD */
+.dashboard{flex:1;overflow-y:auto;padding:24px}
+.dashboard::-webkit-scrollbar{width:4px}
+.dashboard::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+.dash-welcome{margin-bottom:24px}
+.dash-title{font-size:22px;font-weight:700;color:var(--text)}
+.dash-sub{font-size:13px;color:var(--text-dim);margin-top:4px}
+.stats-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:28px}
+.stat-card{background:var(--dark2);border:1px solid var(--border-light);border-radius:10px;padding:16px;cursor:pointer;transition:all 0.2s;position:relative;overflow:hidden}
+.stat-card:hover{border-color:var(--border);transform:translateY(-1px)}
+.stat-card::before{content:'';position:absolute;top:0;right:0;width:3px;height:100%;border-radius:0 10px 10px 0}
+.stat-card.reg::before{background:var(--gold)}
+.stat-card.tx::before{background:var(--amber)}
+.stat-card.poa::before{background:var(--teal)}
+.stat-card.will::before{background:var(--purple)}
+.stat-card.lit::before{background:var(--red)}
+.stat-icon{font-size:24px;margin-bottom:8px}
+.stat-label{font-size:11px;color:var(--text-dimmer);font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px}
+.stat-num{font-size:26px;font-weight:700;color:var(--text)}
+.stat-sub{font-size:11px;color:var(--text-dimmer);margin-top:2px}
+
+.dash-sections{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.dash-section{background:var(--dark2);border:1px solid var(--border-light);border-radius:10px;overflow:hidden}
+.ds-header{padding:14px 18px;border-bottom:1px solid var(--border-light);display:flex;justify-content:space-between;align-items:center}
+.ds-title{font-size:12px;font-weight:600;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.8px}
+.ds-link{font-size:11px;color:var(--gold);cursor:pointer}
+.ds-link:hover{text-decoration:underline}
+.ds-body{padding:8px 0}
+.ds-item{padding:10px 18px;border-bottom:1px solid var(--border-light);display:flex;justify-content:space-between;align-items:center;cursor:pointer;transition:background 0.15s}
+.ds-item:last-child{border-bottom:none}
+.ds-item:hover{background:var(--dark3)}
+.dsi-name{font-size:13px;font-weight:500}
+.dsi-sub{font-size:11px;color:var(--text-dimmer);margin-top:2px}
+.dsi-badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px}
+
+/* SIDEBAR */
+.sidebar{width:280px;min-width:280px;background:var(--dark2);border-left:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;flex-shrink:0}
+.sb-header{padding:14px 16px 10px;border-bottom:1px solid var(--border-light)}
+.sb-title{font-size:11px;font-weight:600;color:var(--text-dim);letter-spacing:1px;text-transform:uppercase;margin-bottom:10px}
+.search-box{background:var(--dark3);border:1px solid var(--border);border-radius:6px;padding:7px 10px;display:flex;align-items:center;gap:7px}
+.search-box input{background:none;border:none;color:var(--text);font-size:13px;font-family:'Heebo',sans-serif;width:100%;outline:none;direction:rtl}
+.search-box input::placeholder{color:var(--text-dimmer)}
+.filter-row{display:flex;gap:5px;padding:8px 12px;border-bottom:1px solid var(--border-light);flex-wrap:wrap}
+.fb{padding:4px 9px;border-radius:20px;border:1px solid var(--border);background:transparent;color:var(--text-dim);font-size:10px;font-weight:600;font-family:'Heebo',sans-serif;cursor:pointer;transition:all 0.2s;white-space:nowrap}
+.cases-list{flex:1;overflow-y:auto;padding:8px 0}
+.cases-list::-webkit-scrollbar{width:4px}
+.cases-list::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+.add-btn{margin:12px 16px;background:var(--gold);color:var(--dark);border:none;border-radius:6px;padding:9px 14px;font-size:13px;font-weight:600;font-family:'Heebo',sans-serif;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;width:calc(100% - 32px);transition:background 0.2s}
+.add-btn:hover{background:var(--gold-light)}
+
+/* CASE ITEMS */
+.case-item{padding:11px 16px;cursor:pointer;border-right:3px solid transparent;transition:all 0.15s;border-bottom:1px solid var(--border-light)}
+.case-item:hover{background:var(--dark3)}
+.case-item.active{background:var(--gold-dim);border-right-color:var(--gold)}
+.ci-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:3px}
+.ci-name{font-size:13px;font-weight:500}
+.ci-date{font-size:11px;color:var(--text-dimmer)}
+.ci-sub{font-size:11px;color:var(--text-dim);margin-bottom:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ci-bottom{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}
+.pill{font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px}
+.pill.gold{background:var(--gold-dim);color:var(--gold)}
+.pill.amber{background:var(--amber-dim);color:var(--amber)}
+.pill.blue{background:var(--blue-dim);color:var(--blue)}
+.pill.green{background:var(--green-dim);color:var(--green)}
+.pill.red{background:var(--red-dim);color:var(--red)}
+.pill.purple{background:var(--purple-dim);color:var(--purple)}
+.pill.teal{background:var(--teal-dim);color:var(--teal)}
+.mini-progress{background:var(--dark3);border-radius:4px;height:3px;overflow:hidden;margin-top:4px}
+.mini-progress-fill{height:100%;background:var(--gold);border-radius:4px;transition:width 0.3s}
+
+/* CONTENT AREA */
+.content-area{flex:1;overflow-y:auto;display:flex;flex-direction:column}
+.content-area::-webkit-scrollbar{width:4px}
+.content-area::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+.empty-state{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--text-dimmer);gap:14px;padding:40px;text-align:center}
+.empty-icon{font-size:52px;opacity:0.25}
+
+/* CASE HEADER */
+.case-header{background:var(--dark2);border-bottom:1px solid var(--border);padding:16px 24px;flex-shrink:0}
+.ch-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px}
+.ch-name{font-size:20px;font-weight:700}
+.ch-sub{font-size:13px;color:var(--text-dim);margin-top:3px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.case-btns{display:flex;gap:8px}
+.btn-sec{background:var(--dark3);border:1px solid var(--border);color:var(--text-dim);border-radius:6px;padding:7px 14px;font-size:12px;font-family:'Heebo',sans-serif;cursor:pointer;font-weight:500;transition:all 0.2s}
+.btn-sec:hover{border-color:var(--gold);color:var(--gold)}
+.btn-pri{background:var(--gold);border:none;color:var(--dark);border-radius:6px;padding:7px 14px;font-size:12px;font-family:'Heebo',sans-serif;cursor:pointer;font-weight:700}
+.btn-del{background:var(--red-dim);border:1px solid rgba(224,85,85,0.3);color:var(--red);border-radius:6px;padding:7px 14px;font-size:12px;font-family:'Heebo',sans-serif;cursor:pointer;font-weight:500;transition:all 0.2s}
+.btn-del:hover{background:var(--red);color:white}
+.btn-pri:hover{background:var(--gold-light)}
+.progress-wrap{overflow-x:auto;padding-bottom:4px}
+.progress-bar{display:flex;align-items:flex-start;min-width:max-content}
+.ps{display:flex;flex-direction:column;align-items:center;position:relative;min-width:80px}
+.ps:not(:last-child)::after{content:'';position:absolute;top:11px;left:-50%;width:100%;height:2px;background:var(--border);z-index:0}
+.ps.done:not(:last-child)::after{background:var(--gold)}
+.pc{width:22px;height:22px;border-radius:50%;border:2px solid var(--border);background:var(--dark);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:var(--text-dimmer);position:relative;z-index:1;transition:all 0.2s}
+.ps.done .pc{background:var(--gold);border-color:var(--gold);color:var(--dark)}
+.ps.active .pc{border-color:var(--gold);color:var(--gold);background:var(--gold-dim)}
+.pl{font-size:9px;color:var(--text-dimmer);margin-top:4px;text-align:center;max-width:76px;line-height:1.3}
+.ps.active .pl{color:var(--gold);font-weight:500}
+.ps.done .pl{color:var(--text-dim)}
+
+/* META ROW */
+.meta-row{display:flex;gap:0;border-bottom:1px solid var(--border-light);flex-wrap:wrap;flex-shrink:0}
+.mi{flex:1;min-width:100px;padding:11px 16px;border-left:1px solid var(--border-light)}
+.mi:last-child{border-left:none}
+.ml{font-size:10px;color:var(--text-dimmer);font-weight:600;letter-spacing:0.5px;text-transform:uppercase;margin-bottom:3px}
+.mv{font-size:13px;font-weight:500}
+.mv.gold{color:var(--gold)}
+.mv.green{color:var(--green)}
+.mv.amber{color:var(--amber)}
+.mv.red{color:var(--red)}
+
+/* INNER TABS */
+.inner-tabs{display:flex;gap:0;border-bottom:1px solid var(--border-light);background:var(--dark2);padding:0 20px;flex-shrink:0}
+.it{padding:10px 14px;font-size:12px;color:var(--text-dim);cursor:pointer;border-bottom:2px solid transparent;transition:all 0.2s;white-space:nowrap}
+.it.active{color:var(--gold);border-bottom-color:var(--gold);font-weight:500}
+
+/* SECTION */
+.sec{padding:16px 20px}
+.sec-title{font-size:11px;font-weight:600;color:var(--text-dim);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.sec-title::after{content:'';flex:1;height:1px;background:var(--border-light)}
+
+/* CARDS & ITEMS */
+.card{background:var(--dark2);border:1px solid var(--border-light);border-radius:8px;padding:12px 14px;margin-bottom:8px}
+.card:last-child{margin-bottom:0}
+.doc-item{background:var(--dark2);border:1px solid var(--border-light);border-radius:8px;padding:10px 14px;display:flex;align-items:center;gap:10px;cursor:pointer;transition:all 0.2s;margin-bottom:6px}
+.doc-item:hover{border-color:var(--border)}
+.doc-item.received{border-color:rgba(76,175,122,0.25)}
+.doc-check{width:20px;height:20px;border-radius:50%;border:2px solid var(--text-dimmer);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:11px;transition:all 0.2s}
+.doc-item.received .doc-check{background:var(--green);border-color:var(--green);color:white}
+.doc-info{flex:1}
+.doc-name{font-size:13px;font-weight:500}
+.doc-sub{font-size:11px;color:var(--text-dimmer);margin-top:1px}
+.doc-status{font-size:10px;font-weight:600;padding:2px 9px;border-radius:10px;white-space:nowrap}
+.doc-status.received{background:var(--green-dim);color:var(--green)}
+.doc-status.missing{background:var(--red-dim);color:var(--red)}
+.doc-status.pending{background:var(--amber-dim);color:var(--amber)}
+
+/* FIN GRID */
+.fin-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.fc{background:var(--dark2);border:1px solid var(--border-light);border-radius:8px;padding:14px}
+.fc-label{font-size:10px;color:var(--text-dimmer);font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:5px}
+.fc-value{font-size:18px;font-weight:700;color:var(--gold)}
+.fc-sub{font-size:11px;color:var(--text-dimmer);margin-top:2px}
+
+/* HEARING */
+.hearing-item{background:var(--dark2);border:1px solid var(--border-light);border-radius:8px;padding:11px 14px;display:flex;justify-content:space-between;align-items:center;margin-bottom:7px;transition:all 0.2s}
+.hearing-item.soon{border-color:rgba(232,168,58,0.4)}
+
+/* NOTES / TL */
+.notes-area{background:var(--dark2);border:1px solid var(--border-light);border-radius:8px;padding:12px}
+.notes-area textarea{background:none;border:none;color:var(--text);font-size:13px;font-family:'Heebo',sans-serif;width:100%;resize:none;outline:none;line-height:1.7;min-height:100px;direction:rtl}
+.notes-area textarea::placeholder{color:var(--text-dimmer)}
+.tl-item{display:flex;gap:10px;padding-bottom:14px;position:relative}
+.tl-item:not(:last-child)::before{content:'';position:absolute;right:6px;top:18px;bottom:0;width:1px;background:var(--border-light)}
+.tl-dot{width:14px;height:14px;border-radius:50%;background:var(--dark3);border:2px solid var(--border);flex-shrink:0;margin-top:3px}
+.tl-dot.gold{background:var(--gold-dim);border-color:var(--gold)}
+.tl-dot.green{background:var(--green-dim);border-color:var(--green)}
+.tl-dot.red{background:var(--red-dim);border-color:var(--red)}
+.tl-dot.purple{background:var(--purple-dim);border-color:var(--purple)}
+.tl-dot.teal{background:var(--teal-dim);border-color:var(--teal)}
+.tl-title{font-size:13px;font-weight:500}
+.tl-date{font-size:11px;color:var(--text-dimmer);margin-top:1px}
+
+/* STATUS SWITCHER */
+.ss{display:flex;gap:8px;margin-bottom:14px}
+.ss-btn{flex:1;padding:7px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--text-dim);font-size:11px;font-weight:600;font-family:'Heebo',sans-serif;cursor:pointer;transition:all 0.2s}
+
+/* SCOPE GRID */
+.scope-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:14px}
+.scope-card{background:var(--dark2);border:2px solid var(--border-light);border-radius:8px;padding:12px;text-align:center;cursor:pointer;transition:all 0.2s}
+.scope-card.active-medical{border-color:var(--red);background:var(--red-dim)}
+.scope-card.active-financial{border-color:var(--green);background:var(--green-dim)}
+.scope-card.active-personal{border-color:var(--blue);background:var(--blue-dim)}
+
+/* FORM OVERLAY */
+.form-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:200;align-items:center;justify-content:center}
+.form-overlay.open{display:flex}
+.form-card{background:var(--dark2);border:1px solid var(--border);border-radius:12px;padding:24px;width:520px;max-width:95vw;max-height:92vh;overflow-y:auto}
+.form-card::-webkit-scrollbar{width:4px}
+.form-card::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+.form-title{font-size:16px;font-weight:700;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center}
+.form-close{cursor:pointer;color:var(--text-dimmer);font-size:22px;line-height:1}
+.form-close:hover{color:var(--text)}
+.fg{margin-bottom:12px}
+.fl{font-size:11px;font-weight:600;color:var(--text-dim);letter-spacing:0.5px;text-transform:uppercase;margin-bottom:5px;display:block}
+.fi{width:100%;background:var(--dark3);border:1px solid var(--border);border-radius:6px;padding:8px 12px;color:var(--text);font-size:13px;font-family:'Heebo',sans-serif;outline:none;direction:rtl;transition:border-color 0.2s}
+.fi:focus{border-color:var(--gold)}
+.fr{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.fsec{font-size:11px;font-weight:600;color:var(--text-dim);letter-spacing:0.8px;text-transform:uppercase;margin:14px 0 8px;padding-bottom:6px;border-bottom:1px solid var(--border-light)}
+.type-row{display:flex;gap:8px;margin-bottom:14px}
+.type-opt{flex:1;padding:8px;border-radius:7px;border:2px solid var(--border);background:transparent;color:var(--text-dim);font-size:12px;font-weight:600;font-family:'Heebo',sans-serif;cursor:pointer;transition:all 0.2s;text-align:center}
+.form-actions{display:flex;gap:10px;margin-top:18px}
+.form-actions .btn-pri{flex:1;padding:10px;font-size:14px}
+.form-actions .btn-sec{padding:10px 20px}
+</style>
+</head>
+<body>
+
+<!-- FORM OVERLAY (dynamic) -->
+<div class="form-overlay" id="formOverlay">
+  <div class="form-card" id="formCard"></div>
+</div>
+
+<!-- NAV -->
+<div class="top-nav">
+  <div class="nav-brand">⚖ חסון עורכי דין</div>
+  <div class="nav-tabs">
+    <div class="nav-tab active" id="tab-dash" onclick="switchModule('dash')">🏠 לוח בקרה</div>
+    <div class="nav-tab" id="tab-reg" onclick="switchModule('reg')">📋 רישומים <span class="tab-badge" id="b-reg">0</span></div>
+    <div class="nav-tab" id="tab-tx" onclick="switchModule('tx')">🤝 עסקאות <span class="tab-badge" id="b-tx">0</span></div>
+    <div class="nav-tab" id="tab-poa" onclick="switchModule('poa')">📄 יפוי כוח <span class="tab-badge" id="b-poa">0</span></div>
+    <div class="nav-tab" id="tab-will" onclick="switchModule('will')">📜 צוואות <span class="tab-badge" id="b-will">0</span></div>
+    <div class="nav-tab" id="tab-lit" onclick="switchModule('lit')">⚖️ ליטיגציה <span class="tab-badge" id="b-lit">0</span></div>
+  </div>
+</div>
+
+<div class="app-body">
+
+  <!-- DASHBOARD -->
+  <div class="module active" id="mod-dash">
+    <div class="dashboard">
+      <div class="dash-welcome">
+        <div class="dash-title">שלום רועי 👋</div>
+        <div class="dash-sub" id="dash-date"></div>
+      </div>
+      <div class="stats-grid">
+        <div class="stat-card reg" onclick="switchModule('reg')">
+          <div class="stat-icon">📋</div>
+          <div class="stat-label">רישומים</div>
+          <div class="stat-num" id="ds-reg">0</div>
+          <div class="stat-sub">תיקים פעילים</div>
+        </div>
+        <div class="stat-card tx" onclick="switchModule('tx')">
+          <div class="stat-icon">🤝</div>
+          <div class="stat-label">עסקאות</div>
+          <div class="stat-num" id="ds-tx">0</div>
+          <div class="stat-sub">תיקים פעילים</div>
+        </div>
+        <div class="stat-card poa" onclick="switchModule('poa')">
+          <div class="stat-icon">📄</div>
+          <div class="stat-label">יפוי כוח</div>
+          <div class="stat-num" id="ds-poa">0</div>
+          <div class="stat-sub">תיקים פעילים</div>
+        </div>
+        <div class="stat-card will" onclick="switchModule('will')">
+          <div class="stat-icon">📜</div>
+          <div class="stat-label">צוואות</div>
+          <div class="stat-num" id="ds-will">0</div>
+          <div class="stat-sub">תיקים פעילים</div>
+        </div>
+        <div class="stat-card lit" onclick="switchModule('lit')">
+          <div class="stat-icon">⚖️</div>
+          <div class="stat-label">ליטיגציה</div>
+          <div class="stat-num" id="ds-lit">0</div>
+          <div class="stat-sub">תיקים פעילים</div>
+        </div>
+      </div>
+      <div class="dash-sections">
+        <div class="dash-section">
+          <div class="ds-header">
+            <div class="ds-title">🗓 דיונים הבאים</div>
+            <div class="ds-link" onclick="switchModule('lit')">לכל הדיונים ←</div>
+          </div>
+          <div class="ds-body" id="dash-hearings"></div>
+        </div>
+        <div class="dash-section">
+          <div class="ds-header">
+            <div class="ds-title">⏰ תיקים דחופים</div>
+            <div class="ds-link">לפי מועד סיום ←</div>
+          </div>
+          <div class="ds-body" id="dash-urgent"></div>
+        </div>
+        <div class="dash-section">
+          <div class="ds-header">
+            <div class="ds-title">📂 תיקים אחרונים שנפתחו</div>
+          </div>
+          <div class="ds-body" id="dash-recent"></div>
+        </div>
+        <div class="dash-section">
+          <div class="ds-header">
+            <div class="ds-title">💰 הכנסות שכ"ט</div>
+          </div>
+          <div class="ds-body" id="dash-fees" style="padding:16px 18px"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- REG MODULE -->
+  <div class="module" id="mod-reg">
+    <div class="sidebar">
+      <div class="sb-header">
+        <div class="sb-title">תיקי רישום</div>
+        <div class="search-box"><span style="color:var(--text-dimmer)">🔍</span><input placeholder="חיפוש..." id="s-reg" oninput="render('reg')"/></div>
+      </div>
+      <div class="cases-list" id="list-reg"></div>
+      <button class="add-btn" onclick="openForm('reg')">+ תיק רישום חדש</button>
+    </div>
+    <div class="content-area" id="ca-reg"><div class="empty-state"><div class="empty-icon">📋</div><div>בחר תיק או פתח חדש</div></div></div>
+  </div>
+
+  <!-- TX MODULE -->
+  <div class="module" id="mod-tx">
+    <div class="sidebar">
+      <div class="sb-header">
+        <div class="sb-title">תיקי עסקאות</div>
+        <div class="search-box"><span style="color:var(--text-dimmer)">🔍</span><input placeholder="חיפוש..." id="s-tx" oninput="render('tx')"/></div>
+      </div>
+      <div class="filter-row">
+        <button class="fb" id="tf-tx-all" onclick="setF('tx','all')">הכל</button>
+        <button class="fb" id="tf-tx-sell" onclick="setF('tx','sell')">🏷 מכר</button>
+        <button class="fb" id="tf-tx-buy" onclick="setF('tx','buy')">🔑 רכישה</button>
+      </div>
+      <div class="cases-list" id="list-tx"></div>
+      <button class="add-btn" onclick="openForm('tx')">+ תיק עסקה חדש</button>
+    </div>
+    <div class="content-area" id="ca-tx"><div class="empty-state"><div class="empty-icon">🤝</div><div>בחר תיק או פתח חדש</div></div></div>
+  </div>
+
+  <!-- POA MODULE -->
+  <div class="module" id="mod-poa">
+    <div class="sidebar">
+      <div class="sb-header">
+        <div class="sb-title">תיקי יכ"מ</div>
+        <div class="search-box"><span style="color:var(--text-dimmer)">🔍</span><input placeholder="חיפוש..." id="s-poa" oninput="render('poa')"/></div>
+      </div>
+      <div class="cases-list" id="list-poa"></div>
+      <button class="add-btn" onclick="openForm('poa')">+ יפוי כוח מתמשך חדש</button>
+    </div>
+    <div class="content-area" id="ca-poa"><div class="empty-state"><div class="empty-icon">📄</div><div>בחר תיק או פתח חדש</div></div></div>
+  </div>
+
+  <!-- WILL MODULE -->
+  <div class="module" id="mod-will">
+    <div class="sidebar">
+      <div class="sb-header">
+        <div class="sb-title">תיקי צוואות</div>
+        <div class="search-box"><span style="color:var(--text-dimmer)">🔍</span><input placeholder="חיפוש..." id="s-will" oninput="render('will')"/></div>
+      </div>
+      <div class="filter-row">
+        <button class="fb" id="tf-will-all" onclick="setF('will','all')">הכל</button>
+        <button class="fb" id="tf-will-edim" onclick="setF('will','edim')">👥 עדים</button>
+        <button class="fb" id="tf-will-notary" onclick="setF('will','notary')">🏛 נוטריון</button>
+      </div>
+      <div class="cases-list" id="list-will"></div>
+      <button class="add-btn" onclick="openForm('will')">+ צוואה חדשה</button>
+    </div>
+    <div class="content-area" id="ca-will"><div class="empty-state"><div class="empty-icon">📜</div><div>בחר תיק או פתח חדש</div></div></div>
+  </div>
+
+  <!-- LIT MODULE -->
+  <div class="module" id="mod-lit">
+    <div class="sidebar">
+      <div class="sb-header">
+        <div class="sb-title">תיקי ליטיגציה</div>
+        <div class="search-box"><span style="color:var(--text-dimmer)">🔍</span><input placeholder="חיפוש..." id="s-lit" oninput="render('lit')"/></div>
+      </div>
+      <div class="filter-row">
+        <button class="fb" id="tf-lit-all" onclick="setF('lit','all')">הכל</button>
+        <button class="fb" id="tf-lit-pinuy" onclick="setF('lit','pinuy')">🏠 פינוי</button>
+        <button class="fb" id="tf-lit-piruk" onclick="setF('lit','piruk')">⚖️ פירוק</button>
+        <button class="fb" id="tf-lit-kablan" onclick="setF('lit','kablan')">🏗 קבלן</button>
+        <button class="fb" id="tf-lit-tzava" onclick="setF('lit','tzava')">📜 צוואה</button>
+      </div>
+      <div class="cases-list" id="list-lit"></div>
+      <button class="add-btn" onclick="openForm('lit')">+ תיק ליטיגציה חדש</button>
+    </div>
+    <div class="content-area" id="ca-lit"><div class="empty-state"><div class="empty-icon">⚖️</div><div>בחר תיק או פתח חדש</div></div></div>
+  </div>
+
+</div>
+
+<script>
+// ============================================================
+// DATA
+// ============================================================
+const REG_STAGES=['פגישה ראשונית','איסוף מסמכים','בדיקת רישום','עריכת מסמכים','הגשה לרשם','מעקב','סיום'];
+const TX_STAGES_SELL=['פגישה/כוונות','בדיקת טאבו','ניסוח הסכם','חתימות+מקדמה','דיווח מיסים','תשלום מס שבח','הערת אזהרה','מסירת חזקה','סיום+יתרה','רישום זכויות'];
+const TX_STAGES_BUY=['פגישה/כוונות','בדיקת טאבו','ניסוח הסכם','חתימות+מקדמה','דיווח מיסים','תשלום מס רכישה','הערת אזהרה','מימון','מסירת חזקה','סיום+יתרה'];
+const POA_STAGES=['פגישה+הסבר','בדיקת כשרות','עריכת מסמך','חתימה+אימות','הפקדה','משלוח עותקים','סיום+תיוק'];
+const WILL_STAGES=['פגישה+רצונות','בדיקת כשרות','עריכת צוואה','חתימה+אימות','הפקדה ברשם','סיום+תיוק'];
+const LIT_STAGES=['פגישה+עילה','גישור/מו"מ','כתבי טענות','הגשה+אגרה','דיונים מקדמיים','תצהירות+גילוי','ראיות/מומחה','דיון הוכחות','פסיקה/הסדר'];
+
+const REG_DOCS=[
+  {id:'mashabah',name:'אישור מס שבח',sub:'מרשות המסים'},
+  {id:'masrehisha',name:'אישור מס רכישה',sub:'מרשות המסים'},
+  {id:'iriya',name:'אישור עירייה',sub:'היטל השבחה ואגרות'},
+  {id:'vaada',name:'אישור ועדה לתכנון ובניה',sub:'היתר בניה / אי-חריגה'},
+  {id:'shtarot',name:'שטרות מכר חתומים',sub:'חתימות כדין'},
+  {id:'bank',name:'הסכמת בנק / משכנתא',sub:'אם קיימת משכנתא'},
+  {id:'hazaara',name:'הסכמת בעלי הערת אזהרה',sub:'כל בעלי הזכויות הרשומות'}
+];
+const TX_DOCS=[
+  {id:'nasah',name:'נסח טאבו',sub:'עדכני עד 30 יום'},
+  {id:'zchuyot',name:'אישור זכויות',sub:'מחברה משכנת'},
+  {id:'mashabah',name:'אישור מס שבח',sub:'מרשות המסים'},
+  {id:'masrehisha',name:'אישור מס רכישה',sub:'מרשות המסים'},
+  {id:'iriya',name:'אישור עירייה',sub:'היטל השבחה'},
+  {id:'mashneta',name:'מסמכי משכנתא',sub:'מהבנק המלווה'},
+  {id:'yipuy',name:'ייפוי כוח',sub:'מאומת נוטריון/עו"ד'},
+  {id:'heskem',name:'הסכם מכר חתום',sub:'חתימות כל הצדדים'},
+  {id:'tashlumim',name:'קבלות תשלום/ערבויות',sub:'אסמכתאות בנקאיות'},
+  {id:'tz',name:'צילום ת"ז שני הצדדים',sub:'בתוקף'}
+];
+
+// Storage
+let DB = {
+  reg: [
+    {id:1,name:'משפחת כהן',phone:'052-1234567',address:'הרצל 12, נתניה',gush:'8120',helka:'45',fee:8500,opposing:'עו"ד לוי',stage:5,
+     docs:{mashabah:'received',masrehisha:'received',iriya:'received',vaada:'pending',shtarot:'received',bank:'received',hazaara:'missing'},
+     notes:'תיק דחוף - מועד גמר חוזה ב-15.7',created:'02/06/2025',
+     timeline:[{t:'פגישה ראשונית',d:'02/06/2025',c:'gold'},{t:'מסמכי מסים התקבלו',d:'10/06/2025',c:'green'},{t:'הגשה לרשם',d:'12/06/2025',c:'gold'}]},
+    {id:2,name:'אברהם לוי',phone:'054-9876543',address:'ביאליק 7, כפר יונה',gush:'7890',helka:'12',fee:6200,opposing:'עו"ד גולן',stage:3,
+     docs:{mashabah:'received',masrehisha:'missing',iriya:'missing',vaada:'missing',shtarot:'pending',bank:'missing',hazaara:'missing'},
+     notes:'',created:'08/06/2025',
+     timeline:[{t:'פתיחת תיק',d:'08/06/2025',c:'gold'},{t:'בדיקת מצב רישום',d:'09/06/2025',c:'green'}]}
+  ],
+  tx: [
+    {id:1,type:'sell',name:'משפחת אברמוביץ',phone:'052-3456789',address:'ויצמן 5, נתניה',gush:'8200',helka:'33',
+     price:1950000,fee:14000,opposing:"עו\"ד ברק",deadline:'2025-08-20',stage:5,
+     docs:{nasah:'received',zchuyot:'received',mashabah:'pending',masrehisha:'missing',iriya:'received',mashneta:'missing',yipuy:'received',heskem:'received',tashlumim:'received',tz:'received'},
+     payments:[{label:'מקדמה 10%',amount:195000,paid:true,date:'10/06/2025'},{label:'יתרה 90%',amount:1755000,paid:false,date:'20/08/2025'}],
+     notes:'',created:'05/06/2025',
+     timeline:[{t:'פגישה ראשונית',d:'05/06/2025',c:'gold'},{t:'חתימות + מקדמה',d:'10/06/2025',c:'green'}]},
+    {id:2,type:'buy',name:'דוד מזרחי',phone:'054-7654321',address:'ביאליק 3, כפר יונה',gush:'7850',helka:'22',
+     price:1200000,fee:9500,opposing:"עו\"ד גולן",deadline:'2025-09-01',stage:3,
+     docs:{nasah:'received',zchuyot:'missing',mashabah:'missing',masrehisha:'missing',iriya:'missing',mashneta:'pending',yipuy:'received',heskem:'pending',tashlumim:'missing',tz:'received'},
+     payments:[{label:'מקדמה 10%',amount:120000,paid:false,date:'01/09/2025'},{label:'יתרה 90%',amount:1080000,paid:false,date:'01/09/2025'}],
+     notes:'קונה ראשון — זכאי להטבה במס רכישה.',created:'10/06/2025',
+     timeline:[{t:'פגישה ראשונית',d:'10/06/2025',c:'gold'}]}
+  ],
+  poa: [
+    {id:1,name:'רחל שמש',phone:'052-7654321',idNum:'123456789',dob:'1945-03-15',address:'הבנים 8, נתניה',
+     attorneys:[{name:'דוד שמש',rel:'בן',order:'ראשי',scopes:{medical:true,financial:true,personal:true}}],
+     scopes:{medical:true,financial:true,personal:true},
+     instructions:'אינני מעוניינת בהחייאה מלאכותית.',medicalNotes:'סוכרת סוג 2.',
+     fee:3500,stage:6,status:'filed',signDate:'10/05/2025',filingDate:'15/05/2025',filingRef:'APO-2025-44821',
+     notes:'',created:'01/05/2025',
+     timeline:[{t:'פגישה ראשונית',d:'01/05/2025',c:'gold'},{t:'חתימה ואימות',d:'10/05/2025',c:'green'},{t:'הפקדה',d:'15/05/2025',c:'teal'}]}
+  ],
+  will: [
+    {id:1,type:'edim',name:'אברהם לוי',phone:'052-9988776',idNum:'111222333',dob:'1940-06-20',address:'ביאליק 5, כפר יונה',
+     heirs:[{name:'יוסי לוי',rel:'בן',share:50},{name:'רחל כהן',rel:'בת',share:50}],
+     assets:[{icon:'🏠',name:'דירה בכפר יונה',detail:'ביאליק 5',heir:'שני הילדים'}],
+     executor:'יוסי לוי',witnesses:[{name:'דוד שמש',idNum:'444555666',order:'עד ראשון'}],
+     fee:4200,stage:5,status:'filed',signDate:'08/05/2025',filingDate:'12/05/2025',filingRef:'WR-2025-18844',
+     notes:'',created:'28/04/2025',
+     timeline:[{t:'פגישה ראשונית',d:'28/04/2025',c:'gold'},{t:'חתימה בפני עדים',d:'08/05/2025',c:'green'},{t:'הפקדה ברשם',d:'12/05/2025',c:'purple'}]}
+  ],
+  lit: [
+    {id:1,type:'pinuy',subtype:'',name:'יעקב אברהם',phone:'052-3456789',subject:'פינוי דייר מוגן',
+     court:'שלום נתניה',caseNum:'55321/25',stage:4,opposingParty:'אחמד מוחמד',opposingAtty:"עו\"ד ברוך",
+     claim:85000,fee:18000,verdict:'open',
+     briefs:{kb_claim:'filed',kb_counter:'filed',kb_motion:'filed',kb_affidav:'pending',kb_expert:'missing',kb_summ:'missing'},
+     hearings:[{type:'דיון מקדמי',court:'שלום נתניה',date:'2025-07-10',time:'09:30',past:false}],
+     notes:'דייר מוגן לכאורה.',created:'20/05/2025',
+     timeline:[{t:'פגישה ראשונית',d:'20/05/2025',c:'gold'},{t:'כתב תביעה הוגש',d:'05/06/2025',c:'green'}]},
+    {id:2,type:'kablan',subtype:'ליקויי בניה',name:'משפחת לוי',phone:'054-8765432',subject:'ליקויי בניה — דירה חדשה בכפר יונה',
+     court:'שלום נתניה',caseNum:'בהכנה',stage:2,opposingParty:"חברת יוסי בנייה",opposingAtty:"עו\"ד כץ",
+     claim:350000,fee:25000,verdict:'open',
+     briefs:{kb_claim:'missing',kb_counter:'missing',kb_motion:'missing',kb_affidav:'missing',kb_expert:'pending',kb_summ:'missing'},
+     hearings:[],notes:'47 ליקויים — חוות דעת מהנדס.',created:'12/06/2025',
+     timeline:[{t:'פגישה ראשונית',d:'12/06/2025',c:'gold'}]}
+  ]
+};
+
+let selected={reg:null,tx:null,poa:null,will:null,lit:null};
+let innerTab={reg:'docs',tx:'docs',poa:'attorneys',will:'heirs',lit:'hearings'};
+let filters={tx:'all',will:'all',lit:'all'};
+let currentModule='dash';
+
+// ============================================================
+// NAVIGATION
+// ============================================================
+function switchModule(mod){
+  currentModule=mod;
+  document.querySelectorAll('.module').forEach(m=>m.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('mod-'+mod).classList.add('active');
+  document.getElementById('tab-'+mod).classList.add('active');
+  if(mod!=='dash') render(mod);
+  else renderDash();
+}
+
+// ============================================================
+// DASHBOARD
+// ============================================================
+function renderDash(){
+  const now=new Date();
+  document.getElementById('dash-date').textContent=now.toLocaleDateString('he-IL',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  ['reg','tx','poa','will','lit'].forEach(m=>{
+    document.getElementById('ds-'+m).textContent=DB[m].length;
+    document.getElementById('b-'+m).textContent=DB[m].length;
+  });
+  // upcoming hearings
+  const hearings=[];
+  DB.lit.forEach(c=>c.hearings.filter(h=>!h.past).forEach(h=>hearings.push({name:c.name,type:h.type,date:h.date,cid:c.id})));
+  hearings.sort((a,b)=>new Date(a.date)-new Date(b.date));
+  document.getElementById('dash-hearings').innerHTML=hearings.slice(0,4).map(h=>`
+    <div class="ds-item" onclick="switchModule('lit');selectCase('lit',${h.cid})">
+      <div><div class="dsi-name">${h.name}</div><div class="dsi-sub">${h.type}</div></div>
+      <span class="dsi-badge pill amber">${new Date(h.date).toLocaleDateString('he-IL')}</span>
+    </div>`).join('')||'<div style="padding:14px 18px;color:var(--text-dimmer);font-size:13px">אין דיונים קרובים</div>';
+  // urgent tx
+  const urgent=DB.tx.filter(c=>c.deadline).sort((a,b)=>new Date(a.deadline)-new Date(b.deadline));
+  document.getElementById('dash-urgent').innerHTML=urgent.slice(0,4).map(c=>{
+    const days=Math.ceil((new Date(c.deadline)-now)/(1000*60*60*24));
+    return`<div class="ds-item" onclick="switchModule('tx');selectCase('tx',${c.id})">
+      <div><div class="dsi-name">${c.name}</div><div class="dsi-sub">${c.address}</div></div>
+      <span class="dsi-badge pill ${days<=14?'red':'amber'}">${days>0?days+' ימים':'עבר'}</span>
+    </div>`;
+  }).join('')||'<div style="padding:14px 18px;color:var(--text-dimmer);font-size:13px">אין תיקים דחופים</div>';
+  // recent
+  const allCases=[];
+  Object.entries(DB).forEach(([mod,arr])=>arr.forEach(c=>allCases.push({...c,mod})));
+  allCases.sort((a,b)=>b.id-a.id);
+  const modLabel={reg:'📋 רישום',tx:'🤝 עסקה',poa:'📄 יפוי כוח',will:'📜 צוואה',lit:'⚖️ ליטיגציה'};
+  document.getElementById('dash-recent').innerHTML=allCases.slice(0,5).map(c=>`
+    <div class="ds-item" onclick="switchModule('${c.mod}');selectCase('${c.mod}',${c.id})">
+      <div><div class="dsi-name">${c.name}</div><div class="dsi-sub">${c.created}</div></div>
+      <span class="dsi-badge pill gold">${modLabel[c.mod]}</span>
+    </div>`).join('');
+  // fees
+  let totalFee=0;
+  const feeByMod={};
+  Object.entries(DB).forEach(([mod,arr])=>{feeByMod[mod]=arr.reduce((s,c)=>s+(c.fee||0),0);totalFee+=feeByMod[mod];});
+  document.getElementById('dash-fees').innerHTML=`
+    <div style="font-size:24px;font-weight:700;color:var(--gold);margin-bottom:12px">₪${totalFee.toLocaleString()}</div>
+    ${Object.entries(feeByMod).map(([mod,fee])=>`
+      <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--text-dim);margin-bottom:6px">
+        <span>${modLabel[mod]}</span><span style="color:var(--text);font-weight:500">₪${fee.toLocaleString()}</span>
+      </div>`).join('')}`;
+}
+
+// ============================================================
+// RENDER LIST
+// ============================================================
+function render(mod){
+  const search=(document.getElementById('s-'+mod)?.value||'').toLowerCase();
+  const f=filters[mod]||'all';
+  let items=DB[mod].filter(c=>{
+    const ms=c.name.toLowerCase().includes(search)||(c.address||'').toLowerCase().includes(search)||(c.subject||'').toLowerCase().includes(search);
+    const mt=f==='all'||c.type===f;
+    return ms&&mt;
+  });
+  document.getElementById('b-'+mod).textContent=DB[mod].length;
+  document.getElementById('list-'+mod).innerHTML=items.map(c=>caseItemHTML(mod,c)).join('')||
+    '<div style="padding:18px;text-align:center;color:var(--text-dimmer);font-size:13px">לא נמצאו תיקים</div>';
+}
+
+function caseItemHTML(mod,c){
+  const sel=selected[mod]===c.id;
+  let stageName='',pills='',sub='',progress=0;
+  if(mod==='reg'){stageName=REG_STAGES[c.stage-1]||'';sub=c.address;const r=Object.values(c.docs).filter(v=>v==='received').length;progress=Math.round(r/Object.keys(c.docs).length*100);pills=`<span class="pill gold">${stageName}</span>`;}
+  if(mod==='tx'){const stages=c.type==='sell'?TX_STAGES_SELL:TX_STAGES_BUY;stageName=stages[c.stage-1]||'';sub=c.address;const r=Object.values(c.docs).filter(v=>v==='received').length;progress=Math.round(r/Object.keys(c.docs).length*100);pills=`<span class="pill ${c.type==='sell'?'amber':'blue'}">${c.type==='sell'?'🏷 מכר':'🔑 רכישה'}</span><span class="pill gold">${stageName}</span>`;}
+  if(mod==='poa'){stageName=POA_STAGES[c.stage-1]||'';sub=c.attorneys.map(a=>a.name).join(', ');progress=Math.round(c.stage/POA_STAGES.length*100);const sc={pending:'amber',active:'green',filed:'teal'}[c.status]||'amber';pills=`<span class="pill ${sc}">${{pending:'בהכנה',active:'פעיל',filed:'הופקד'}[c.status]}</span>`;}
+  if(mod==='will'){stageName=WILL_STAGES[c.stage-1]||'';sub=c.heirs.map(h=>h.name).join(' · ');progress=Math.round(c.stage/WILL_STAGES.length*100);pills=`<span class="pill ${c.type==='edim'?'blue':'purple'}">${c.type==='edim'?'👥 עדים':'🏛 נוטריון'}</span>`;}
+  if(mod==='lit'){stageName=LIT_STAGES[c.stage-1]||'';sub=c.subject;const r=Object.values(c.briefs).filter(v=>v==='filed').length;progress=Math.round(r/Object.keys(c.briefs).length*100);const tc={pinuy:'red',piruk:'blue',kablan:'amber',tzava:'purple'}[c.type]||'gold';const tl={pinuy:'🏠 פינוי',piruk:'⚖️ פירוק',kablan:'🏗 קבלן',tzava:'📜 צוואה'}[c.type]||c.type;pills=`<span class="pill ${tc}">${tl}${c.subtype?' · '+c.subtype:''}</span>`;}
+  return`<div class="case-item${sel?' active':''}" onclick="selectCase('${mod}',${c.id})">
+    <div class="ci-top"><div class="ci-name">${c.name}</div><div class="ci-date">${c.created}</div></div>
+    <div class="ci-sub">${sub}</div>
+    <div class="ci-bottom">${pills}</div>
+    <div class="mini-progress"><div class="mini-progress-fill" style="width:${progress}%"></div></div>
+  </div>`;
+}
+
+// ============================================================
+// SELECT CASE & RENDER CONTENT
+// ============================================================
+function selectCase(mod,id){
+  selected[mod]=id;
+  innerTab[mod]=mod==='reg'?'docs':mod==='tx'?'docs':mod==='poa'?'attorneys':mod==='will'?'heirs':'hearings';
+  render(mod);
+  renderContent(mod);
+}
+
+function renderContent(mod){
+  const c=DB[mod].find(x=>x.id===selected[mod]);
+  if(!c){return;}
+  const ca=document.getElementById('ca-'+mod);
+
+  // STAGES
+  let stages=mod==='reg'?REG_STAGES:mod==='tx'?(c.type==='sell'?TX_STAGES_SELL:TX_STAGES_BUY):mod==='poa'?POA_STAGES:mod==='will'?WILL_STAGES:LIT_STAGES;
+  const progressHTML=stages.map((s,i)=>{const sn=i+1,done=c.stage>sn,active=c.stage===sn;
+    return`<div class="ps${done?' done':active?' active':''}"><div class="pc">${done?'✓':sn}</div><div class="pl">${s}</div></div>`;}).join('');
+
+  // META
+  let meta='';
+  if(mod==='reg') meta=`<div class="mi"><div class="ml">טלפון</div><div class="mv">${c.phone}</div></div><div class="mi"><div class="ml">עו"ד נגדי</div><div class="mv">${c.opposing||'—'}</div></div><div class="mi"><div class="ml">גוש/חלקה</div><div class="mv gold">${c.gush}/${c.helka}</div></div><div class="mi"><div class="ml">שכ"ט</div><div class="mv gold">₪${Number(c.fee).toLocaleString()}</div></div>`;
+  if(mod==='tx') meta=`<div class="mi"><div class="ml">טלפון</div><div class="mv">${c.phone}</div></div><div class="mi"><div class="ml">עו"ד נגדי</div><div class="mv">${c.opposing||'—'}</div></div><div class="mi"><div class="ml">מחיר</div><div class="mv gold">₪${Number(c.price).toLocaleString()}</div></div><div class="mi"><div class="ml">מועד סיום</div><div class="mv amber">${c.deadline?new Date(c.deadline).toLocaleDateString('he-IL'):'—'}</div></div>`;
+  if(mod==='poa') meta=`<div class="mi"><div class="ml">טלפון</div><div class="mv">${c.phone}</div></div><div class="mi"><div class="ml">ממונה ראשי</div><div class="mv gold">${c.attorneys[0]?.name||'—'}</div></div><div class="mi"><div class="ml">הפקדה</div><div class="mv ${c.filingRef?'teal':''}">${c.filingRef||'טרם הופקד'}</div></div><div class="mi"><div class="ml">שכ"ט</div><div class="mv gold">₪${Number(c.fee).toLocaleString()}</div></div>`;
+  if(mod==='will') meta=`<div class="mi"><div class="ml">טלפון</div><div class="mv">${c.phone}</div></div><div class="mi"><div class="ml">יורשים</div><div class="mv gold">${c.heirs.length} יורשים</div></div><div class="mi"><div class="ml">מנהל עיזבון</div><div class="mv">${c.executor||'—'}</div></div><div class="mi"><div class="ml">הפקדה</div><div class="mv ${c.filingRef?'purple':''}">${c.filingRef||'טרם הופקדה'}</div></div>`;
+  if(mod==='lit'){const nh=c.hearings.filter(h=>!h.past).sort((a,b)=>new Date(a.date)-new Date(b.date))[0];meta=`<div class="mi"><div class="ml">ביהמ"ש</div><div class="mv">${c.court}</div></div><div class="mi"><div class="ml">מס' תיק</div><div class="mv">${c.caseNum||'—'}</div></div><div class="mi"><div class="ml">דיון הבא</div><div class="mv amber">${nh?new Date(nh.date).toLocaleDateString('he-IL'):'אין'}</div></div><div class="mi"><div class="ml">סכום תביעה</div><div class="mv gold">₪${Number(c.claim).toLocaleString()}</div></div>`;}
+
+  // INNER TABS
+  const tabs={
+    reg:[['docs','📋 מסמכים'],['notes','הערות'],['timeline','היסטוריה']],
+    tx:[['docs','📋 מסמכים'],['finance','💰 פיננסי'],['notes','הערות'],['timeline','היסטוריה']],
+    poa:[['attorneys','👥 ממונים'],['instructions','📝 הנחיות'],['dates','📅 תאריכים'],['timeline','היסטוריה']],
+    will:[['heirs','👨‍👩‍👧 יורשים'],['assets','🏠 נכסים'],['dates','📅 תאריכים'],['notes','הערות'],['timeline','היסטוריה']],
+    lit:[['hearings','📅 דיונים'],['briefs','📄 כתבי טענות'],['verdict','🏁 תוצאה'],['notes','הערות'],['timeline','היסטוריה']]
+  };
+  const tabsHTML=tabs[mod].map(([id,label])=>`<div class="it${innerTab[mod]===id?' active':''}" onclick="setIT('${mod}','${id}')">${label}</div>`).join('');
+
+  // CONTENT
+  const content=renderTabContent(mod,c);
+
+  // SUBTITLE
+  let subtitle='';
+  if(mod==='reg') subtitle=`${c.address} | גוש ${c.gush} חלקה ${c.helka}`;
+  if(mod==='tx') subtitle=`<span class="pill ${c.type==='sell'?'amber':'blue'}" style="font-size:11px">${c.type==='sell'?'🏷 מכר':'🔑 רכישה'}</span> ${c.address}`;
+  if(mod==='poa') subtitle=`ת.ז. ${c.idNum||'—'} | ${c.address}`;
+  if(mod==='will') subtitle=`<span class="pill ${c.type==='edim'?'blue':'purple'}" style="font-size:11px">${c.type==='edim'?'👥 עדים':'🏛 נוטריון'}</span> ת.ז. ${c.idNum||'—'}`;
+  if(mod==='lit') subtitle=`<span class="pill ${({pinuy:'red',piruk:'blue',kablan:'amber',tzava:'purple'})[c.type]}" style="font-size:11px">${c.subject}</span>`;
+
+  ca.innerHTML=`
+    <div class="case-header">
+      <div class="ch-top">
+        <div><div class="ch-name">${c.name}</div><div class="ch-sub">${subtitle}</div></div>
+        <div class="case-btns">
+          <button class="btn-sec" onclick="advanceStage('${mod}',${c.id})">קדם שלב ←</button>
+          <button class="btn-del" onclick="deleteCase('${mod}',${c.id})">🗑 מחק תיק</button>
+          <button class="btn-pri">שמור</button>
+        </div>
+      </div>
+      <div class="progress-wrap"><div class="progress-bar">${progressHTML}</div></div>
+    </div>
+    <div class="meta-row">${meta}</div>
+    <div class="inner-tabs">${tabsHTML}</div>
+    <div style="flex:1;overflow-y:auto">${content}</div>`;
+}
+
+function renderTabContent(mod,c){
+  const tab=innerTab[mod];
+
+  if(tab==='docs'){
+    const docs=mod==='reg'?REG_DOCS:TX_DOCS;
+    const labels={received:'התקבל',missing:'חסר',pending:'בהמתנה'};
+    return`<div class="sec">
+      <div class="sec-title">מסמכים</div>
+      ${docs.map(d=>{const status=c.docs[d.id]||'missing';return`<div class="doc-item${status==='received'?' received':''}" onclick="cycleDoc('${mod}',${c.id},'${d.id}')">
+        <div class="doc-check">${status==='received'?'✓':''}</div>
+        <div class="doc-info"><div class="doc-name">${d.name}</div><div class="doc-sub">${d.sub}</div></div>
+        <div class="doc-status ${status}">${labels[status]}</div>
+      </div>`;}).join('')}</div>`;
+  }
+
+  if(tab==='finance'&&mod==='tx'){
+    const paid=c.payments.filter(p=>p.paid).reduce((s,p)=>s+p.amount,0);
+    return`<div class="sec">
+      <div class="fin-grid">
+        <div class="fc"><div class="fc-label">מחיר עסקה</div><div class="fc-value">₪${Number(c.price).toLocaleString()}</div></div>
+        <div class="fc"><div class="fc-label">שכ"ט</div><div class="fc-value">₪${Number(c.fee).toLocaleString()}</div></div>
+        <div class="fc"><div class="fc-label">התקבל</div><div class="fc-value" style="color:var(--green)">₪${paid.toLocaleString()}</div></div>
+        <div class="fc"><div class="fc-label">יתרה</div><div class="fc-value" style="color:var(--amber)">₪${(c.price-paid).toLocaleString()}</div></div>
+      </div>
+      <div class="sec-title">לוח תשלומים</div>
+      ${c.payments.map((p,i)=>`<div class="card" style="display:flex;justify-content:space-between;align-items:center;cursor:pointer" onclick="togglePayment('${mod}',${c.id},${i})">
+        <div><div style="font-size:13px;font-weight:500">${p.label}</div><div style="font-size:11px;color:var(--text-dimmer)">${p.date}</div></div>
+        <div style="text-align:left"><div style="font-size:14px;font-weight:700;color:var(--gold)">₪${Number(p.amount).toLocaleString()}</div>
+        <div class="doc-status ${p.paid?'received':'missing'}" style="margin-top:4px;display:inline-block">${p.paid?'✓ שולם':'טרם שולם'}</div></div>
+      </div>`).join('')}</div>`;
+  }
+
+  if(tab==='attorneys'&&mod==='poa'){
+    const scopeNames={medical:'🏥 רפואי',financial:'💰 כלכלי',personal:'👤 אישי'};
+    return`<div class="sec">
+      <div class="sec-title">תחומי סמכות</div>
+      <div class="scope-grid">
+        ${['medical','financial','personal'].map(s=>`<div class="scope-card${c.scopes[s]?' active-'+s:''}" onclick="toggleScope('${mod}',${c.id},'${s}')">
+          <div style="font-size:20px;margin-bottom:4px">${{medical:'🏥',financial:'💰',personal:'👤'}[s]}</div>
+          <div style="font-size:11px;font-weight:600;color:var(--text-dim)">${{medical:'רפואי',financial:'כלכלי',personal:'אישי'}[s]}</div>
+        </div>`).join('')}
+      </div>
+      <div class="sec-title">ממונים</div>
+      ${c.attorneys.map(a=>`<div class="card">
+        <div style="display:flex;justify-content:space-between;margin-bottom:8px">
+          <div><div style="font-size:13px;font-weight:600">${a.name}</div><div style="font-size:11px;color:var(--text-dimmer)">${a.rel} · ממונה ${a.order}</div></div>
+        </div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          ${a.scopes.medical?'<span class="pill red">🏥 רפואי</span>':''}
+          ${a.scopes.financial?'<span class="pill green">💰 כלכלי</span>':''}
+          ${a.scopes.personal?'<span class="pill blue">👤 אישי</span>':''}
+        </div>
+      </div>`).join('')}
+    </div>`;
+  }
+
+  if(tab==='instructions'&&mod==='poa'){
+    return`<div class="sec">
+      <div class="sec-title">הנחיות מקדימות</div>
+      <div class="notes-area"><textarea onchange="updateField('poa',${c.id},'instructions',this.value)">${c.instructions}</textarea></div>
+      <div class="sec-title" style="margin-top:14px">הערות רפואיות</div>
+      <div class="notes-area"><textarea onchange="updateField('poa',${c.id},'medicalNotes',this.value)">${c.medicalNotes}</textarea></div>
+    </div>`;
+  }
+
+  if(tab==='dates'&&(mod==='poa'||mod==='will')){
+    const statusMap=mod==='poa'?{pending:'⏳ בהכנה',active:'✅ פעיל',filed:'📥 הופקד'}:{draft:'✏️ טיוטה',signed:'✅ חתומה',filed:'📥 הופקדה'};
+    const colors=mod==='poa'?{pending:'amber',active:'green',filed:'teal'}:{draft:'amber',signed:'green',filed:'purple'};
+    return`<div class="sec">
+      <div class="sec-title">סטטוס</div>
+      <div class="ss">${Object.entries(statusMap).map(([k,v])=>`<button class="ss-btn${c.status===k?' act-'+colors[k]:''}" 
+        style="${c.status===k?`border-color:var(--${colors[k]});color:var(--${colors[k]});background:var(--${colors[k]}-dim)`:''}"
+        onclick="setStatus('${mod}',${c.id},'${k}')">${v}</button>`).join('')}</div>
+      <div class="fin-grid">
+        <div class="fc"><div class="fc-label">תאריך חתימה</div><div class="fc-value" style="font-size:15px">${c.signDate||'—'}</div></div>
+        <div class="fc"><div class="fc-label">תאריך הפקדה</div><div class="fc-value" style="font-size:15px">${c.filingDate||'—'}</div></div>
+        <div class="fc" style="grid-column:1/-1"><div class="fc-label">מספר אסמכתא</div><div class="fc-value" style="font-size:14px">${c.filingRef||'—'}</div></div>
+      </div>
+      <div class="fc"><div class="fc-label">שכר טרחה</div><div class="fc-value">₪${Number(c.fee).toLocaleString()}</div></div>
+    </div>`;
+  }
+
+  if(tab==='heirs'&&mod==='will'){
+    const total=c.heirs.reduce((s,h)=>s+h.share,0);
+    return`<div class="sec">
+      <div class="sec-title">יורשים וחלוקה</div>
+      ${c.heirs.map(h=>`<div class="card" style="display:flex;align-items:center;gap:12px">
+        <div style="font-size:20px">👤</div>
+        <div style="flex:1"><div style="font-size:13px;font-weight:600">${h.name}</div><div style="font-size:11px;color:var(--text-dimmer)">${h.rel}</div>
+          <div style="background:var(--dark3);border-radius:3px;height:4px;margin-top:6px"><div style="height:100%;width:${h.share}%;background:var(--gold);border-radius:3px"></div></div>
+        </div>
+        <div style="font-size:16px;font-weight:700;color:var(--gold)">${h.share}%</div>
+      </div>`).join('')}
+      ${total!==100?`<div style="background:var(--amber-dim);border:1px solid var(--amber);border-radius:8px;padding:10px 14px;font-size:12px;color:var(--amber);margin-top:8px">⚠️ סך חלקים: ${total}% (נדרש 100%)</div>`:''}
+      <div class="sec-title" style="margin-top:14px">מנהל עיזבון</div>
+      <div class="card" style="display:flex;align-items:center;gap:10px"><span style="font-size:20px">⚖️</span><div style="font-size:13px;font-weight:500">${c.executor||'לא הוגדר'}</div></div>
+    </div>`;
+  }
+
+  if(tab==='assets'&&mod==='will'){
+    return`<div class="sec">
+      <div class="sec-title">נכסים (${c.assets.length})</div>
+      ${c.assets.map(a=>`<div class="card" style="display:flex;gap:10px">
+        <span style="font-size:18px">${a.icon}</span>
+        <div><div style="font-size:13px;font-weight:500">${a.name}</div><div style="font-size:11px;color:var(--text-dimmer)">${a.detail}</div>
+        <div style="font-size:11px;color:var(--gold);margin-top:3px">→ ${a.heir}</div></div>
+      </div>`).join('')||'<div style="color:var(--text-dimmer);font-size:13px">לא נרשמו נכסים</div>'}
+    </div>`;
+  }
+
+  if(tab==='hearings'&&mod==='lit'){
+    const sorted=[...c.hearings].sort((a,b)=>new Date(a.date)-new Date(b.date));
+    return`<div class="sec">
+      <div class="sec-title">דיונים</div>
+      ${sorted.map((h,i)=>{const days=Math.ceil((new Date(h.date)-new Date())/(1000*60*60*24));const soon=!h.past&&days<=7;
+        return`<div class="hearing-item${soon?' soon':''}">
+          <div><div style="font-size:13px;font-weight:500">${h.type}</div><div style="font-size:11px;color:var(--text-dimmer)">${h.court}</div>
+            <span class="pill ${h.past?'green':'amber'}" style="margin-top:4px;display:inline-block">${h.past?'✓ התקיים':days<=0?'היום':days+' ימים'}</span>
+          </div>
+          <div style="text-align:left"><div style="font-size:14px;font-weight:700;color:var(--gold)">${new Date(h.date).toLocaleDateString('he-IL')}</div><div style="font-size:11px;color:var(--text-dimmer)">${h.time||''}</div></div>
+        </div>`;}).join('')||'<div style="color:var(--text-dimmer);font-size:13px">אין דיונים</div>'}
+      <button class="btn-sec" style="width:100%;margin-top:10px;text-align:center" onclick="addHearingQuick('${mod}',${c.id})">+ הוסף דיון</button>
+    </div>`;
+  }
+
+  if(tab==='briefs'&&mod==='lit'){
+    const BRIEFS=[{id:'kb_claim',name:'כתב תביעה/הגנה'},{id:'kb_counter',name:'כתב תשובה/תגובה'},{id:'kb_motion',name:'בקשות ביניים'},{id:'kb_affidav',name:'תצהיר עדות ראשית'},{id:'kb_expert',name:'חוות דעת מומחה'},{id:'kb_summ',name:'סיכומים'}];
+    const labels={filed:'הוגש',pending:'בהכנה',missing:'טרם'};
+    return`<div class="sec">
+      <div class="sec-title">כתבי טענות</div>
+      ${BRIEFS.map(b=>{const status=c.briefs[b.id]||'missing';return`<div class="doc-item${status==='filed'?' received':''}" onclick="cycleBrief(${c.id},'${b.id}')">
+        <div class="doc-check">${status==='filed'?'✓':''}</div>
+        <div class="doc-info"><div class="doc-name">${b.name}</div></div>
+        <div class="doc-status ${status==='filed'?'received':status==='pending'?'pending':'missing'}">${labels[status]}</div>
+      </div>`;}).join('')}</div>`;
+  }
+
+  if(tab==='verdict'&&mod==='lit'){
+    const vmap={open:'🔵 פתוח',win:'✅ זכינו',settle:'🤝 פשרה',lose:'❌ הפסדנו',appeal:'📋 ערעור'};
+    const vcolors={open:'gold',win:'green',settle:'blue',lose:'red',appeal:'amber'};
+    return`<div class="sec">
+      <div class="sec-title">תוצאה</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px">
+        ${Object.entries(vmap).map(([k,v])=>`<button class="ss-btn${c.verdict===k?' act-'+k:''}"
+          style="flex:none;${c.verdict===k?`border-color:var(--${vcolors[k]});color:var(--${vcolors[k]});background:var(--${vcolors[k]}-dim)`:''}"
+          onclick="setVerdict(${c.id},'${k}')">${v}</button>`).join('')}
+      </div>
+      <div class="fin-grid">
+        <div class="fc"><div class="fc-label">סכום תביעה</div><div class="fc-value">₪${Number(c.claim).toLocaleString()}</div></div>
+        <div class="fc"><div class="fc-label">שכר טרחה</div><div class="fc-value">₪${Number(c.fee).toLocaleString()}</div></div>
+      </div>
+    </div>`;
+  }
+
+  if(tab==='notes'){
+    return`<div class="sec">
+      <div class="sec-title">הערות פנימיות</div>
+      <div class="notes-area"><textarea placeholder="הוסף הערות..." onchange="updateField('${mod}',${c.id},'notes',this.value)">${c.notes}</textarea></div>
+    </div>`;
+  }
+
+  if(tab==='timeline'){
+    return`<div class="sec">
+      <div class="sec-title">היסטוריה</div>
+      <div>${c.timeline.map(t=>`<div class="tl-item">
+        <div class="tl-dot ${t.c}"></div>
+        <div><div class="tl-title">${t.t}</div><div class="tl-date">${t.d}</div></div>
+      </div>`).join('')}</div>
+    </div>`;
+  }
+
+  return`<div class="sec"><div style="color:var(--text-dimmer)">תוכן בקרוב</div></div>`;
+}
+
+// ============================================================
+// ACTIONS
+// ============================================================
+function setIT(mod,tab){innerTab[mod]=tab;renderContent(mod);}
+function setF(mod,f){
+  filters[mod]=f;
+  document.querySelectorAll(`[id^="tf-${mod}-"]`).forEach(el=>{
+    const t=el.id.replace('tf-'+mod+'-','');
+    el.className='fb'+(f===t?' act-all':'');
+  });
+  render(mod);
+}
+function advanceStage(mod,id){
+  const c=DB[mod].find(x=>x.id===id);
+  const stages=mod==='reg'?REG_STAGES:mod==='tx'?(c.type==='sell'?TX_STAGES_SELL:TX_STAGES_BUY):mod==='poa'?POA_STAGES:mod==='will'?WILL_STAGES:LIT_STAGES;
+  if(c.stage<stages.length){c.stage++;const now=new Date().toLocaleDateString('he-IL');c.timeline.push({t:'מעבר לשלב: '+stages[c.stage-1],d:now,c:'gold'});}
+  render(mod);renderContent(mod);
+}
+function cycleDoc(mod,id,docId){const c=DB[mod].find(x=>x.id===id);const cy={missing:'pending',pending:'received',received:'missing'};c.docs[docId]=cy[c.docs[docId]]||'missing';render(mod);renderContent(mod);}
+function cycleBrief(id,bid){const c=DB.lit.find(x=>x.id===id);const cy={missing:'pending',pending:'filed',filed:'missing'};c.briefs[bid]=cy[c.briefs[bid]]||'missing';renderContent('lit');}
+function togglePayment(mod,id,i){DB[mod].find(x=>x.id===id).payments[i].paid=!DB[mod].find(x=>x.id===id).payments[i].paid;renderContent(mod);}
+function toggleScope(mod,id,s){const c=DB[mod].find(x=>x.id===id);c.scopes[s]=!c.scopes[s];renderContent(mod);}
+function setStatus(mod,id,status){const c=DB[mod].find(x=>x.id===id);c.status=status;c.timeline.push({t:'עדכון סטטוס',d:new Date().toLocaleDateString('he-IL'),c:'teal'});render(mod);renderContent(mod);}
+function setVerdict(id,v){const c=DB.lit.find(x=>x.id===id);c.verdict=v;renderContent('lit');}
+function updateField(mod,id,field,val){DB[mod].find(x=>x.id===id)[field]=val;}
+function addHearingQuick(mod,id){
+  const type=prompt('סוג דיון:');if(!type)return;
+  const date=prompt('תאריך (YYYY-MM-DD):');if(!date)return;
+  const c=DB[mod].find(x=>x.id===id);
+  c.hearings.push({type,court:c.court||'',date,time:'',past:false});
+  c.timeline.push({t:'נקבע דיון: '+type,d:new Date().toLocaleDateString('he-IL'),c:'gold'});
+  renderContent(mod);renderDash();
+}
+
+// ============================================================
+// FORMS
+// ============================================================
+function openForm(mod){
+  const templates={
+    reg:`<div class="form-title"><span>📋 תיק רישום חדש</span><span class="form-close" onclick="closeForm()">×</span></div>
+      <div class="fr"><div class="fg"><label class="fl">שם לקוח</label><input class="fi" id="ff-name" placeholder="שם מלא"/></div><div class="fg"><label class="fl">טלפון</label><input class="fi" id="ff-phone"/></div></div>
+      <div class="fg"><label class="fl">כתובת הנכס</label><input class="fi" id="ff-address" placeholder="רחוב, עיר"/></div>
+      <div class="fr"><div class="fg"><label class="fl">גוש</label><input class="fi" id="ff-gush"/></div><div class="fg"><label class="fl">חלקה</label><input class="fi" id="ff-helka"/></div></div>
+      <div class="fr"><div class="fg"><label class="fl">שכ"ט (₪)</label><input class="fi" id="ff-fee" type="number"/></div><div class="fg"><label class="fl">עו"ד נגדי</label><input class="fi" id="ff-opposing"/></div></div>
+      <div class="form-actions"><button class="btn-sec" onclick="closeForm()">ביטול</button><button class="btn-pri" onclick="saveForm('reg')">פתח תיק</button></div>`,
+    tx:`<div class="form-title"><span>🤝 תיק עסקה חדש</span><span class="form-close" onclick="closeForm()">×</span></div>
+      <div class="type-row"><button class="type-opt" id="fft-sell" onclick="setFFT('sell')">🏷 מכר</button><button class="type-opt" id="fft-buy" onclick="setFFT('buy')">🔑 רכישה</button></div>
+      <div class="fr"><div class="fg"><label class="fl">שם לקוח</label><input class="fi" id="ff-name"/></div><div class="fg"><label class="fl">טלפון</label><input class="fi" id="ff-phone"/></div></div>
+      <div class="fg"><label class="fl">כתובת</label><input class="fi" id="ff-address"/></div>
+      <div class="fr"><div class="fg"><label class="fl">גוש</label><input class="fi" id="ff-gush"/></div><div class="fg"><label class="fl">חלקה</label><input class="fi" id="ff-helka"/></div></div>
+      <div class="fr"><div class="fg"><label class="fl">מחיר (₪)</label><input class="fi" id="ff-price" type="number"/></div><div class="fg"><label class="fl">שכ"ט (₪)</label><input class="fi" id="ff-fee" type="number"/></div></div>
+      <div class="fr"><div class="fg"><label class="fl">עו"ד נגדי</label><input class="fi" id="ff-opposing"/></div><div class="fg"><label class="fl">מועד סיום</label><input class="fi" id="ff-deadline" type="date"/></div></div>
+      <div class="form-actions"><button class="btn-sec" onclick="closeForm()">ביטול</button><button class="btn-pri" onclick="saveForm('tx')">פתח תיק</button></div>`,
+    lit:`<div class="form-title"><span>⚖️ תיק ליטיגציה חדש</span><span class="form-close" onclick="closeForm()">×</span></div>
+      <div class="type-row" style="flex-wrap:wrap;gap:6px">
+        <button class="type-opt" id="fft-pinuy" onclick="setFFT('pinuy')">🏠 פינוי</button>
+        <button class="type-opt" id="fft-piruk" onclick="setFFT('piruk')">⚖️ פירוק</button>
+        <button class="type-opt" id="fft-kablan" onclick="setFFT('kablan')">🏗 קבלן</button>
+        <button class="type-opt" id="fft-tzava" onclick="setFFT('tzava')">📜 צוואה</button>
+      </div>
+      <div class="fr"><div class="fg"><label class="fl">שם לקוח</label><input class="fi" id="ff-name"/></div><div class="fg"><label class="fl">טלפון</label><input class="fi" id="ff-phone"/></div></div>
+      <div class="fg"><label class="fl">נושא התיק</label><input class="fi" id="ff-subject"/></div>
+      <div class="fr"><div class="fg"><label class="fl">בית משפט</label><input class="fi" id="ff-court"/></div><div class="fg"><label class="fl">מספר תיק</label><input class="fi" id="ff-casenum"/></div></div>
+      <div class="fr"><div class="fg"><label class="fl">צד שכנגד</label><input class="fi" id="ff-party"/></div><div class="fg"><label class="fl">עו"ד שכנגד</label><input class="fi" id="ff-opposing"/></div></div>
+      <div class="fr"><div class="fg"><label class="fl">סכום תביעה (₪)</label><input class="fi" id="ff-claim" type="number"/></div><div class="fg"><label class="fl">שכ"ט (₪)</label><input class="fi" id="ff-fee" type="number"/></div></div>
+      <div class="form-actions"><button class="btn-sec" onclick="closeForm()">ביטול</button><button class="btn-pri" onclick="saveForm('lit')">פתח תיק</button></div>`,
+    poa:`<div class="form-title"><span>📄 יפוי כוח מתמשך חדש</span><span class="form-close" onclick="closeForm()">×</span></div>
+      <div class="fr"><div class="fg"><label class="fl">שם הממנה</label><input class="fi" id="ff-name"/></div><div class="fg"><label class="fl">טלפון</label><input class="fi" id="ff-phone"/></div></div>
+      <div class="fr"><div class="fg"><label class="fl">ת.ז.</label><input class="fi" id="ff-id"/></div><div class="fg"><label class="fl">כתובת</label><input class="fi" id="ff-address"/></div></div>
+      <div class="fr"><div class="fg"><label class="fl">ממונה ראשי</label><input class="fi" id="ff-atty1"/></div><div class="fg"><label class="fl">יחס</label><input class="fi" id="ff-rel1" placeholder="בן/בת/בן זוג"/></div></div>
+      <div class="fr"><div class="fg"><label class="fl">שכ"ט (₪)</label><input class="fi" id="ff-fee" type="number"/></div><div class="fg"></div></div>
+      <div class="form-actions"><button class="btn-sec" onclick="closeForm()">ביטול</button><button class="btn-pri" onclick="saveForm('poa')">פתח תיק</button></div>`,
+    will:`<div class="form-title"><span>📜 צוואה חדשה</span><span class="form-close" onclick="closeForm()">×</span></div>
+      <div class="type-row"><button class="type-opt" id="fft-edim" onclick="setFFT('edim')">👥 בפני עדים</button><button class="type-opt" id="fft-notary" onclick="setFFT('notary')">🏛 נוטריון</button></div>
+      <div class="fr"><div class="fg"><label class="fl">שם המצווה</label><input class="fi" id="ff-name"/></div><div class="fg"><label class="fl">טלפון</label><input class="fi" id="ff-phone"/></div></div>
+      <div class="fr"><div class="fg"><label class="fl">ת.ז.</label><input class="fi" id="ff-id"/></div><div class="fg"><label class="fl">כתובת</label><input class="fi" id="ff-address"/></div></div>
+      <div class="fr"><div class="fg"><label class="fl">יורש 1</label><input class="fi" id="ff-h1" placeholder="שם — 50%"/></div><div class="fg"><label class="fl">יורש 2</label><input class="fi" id="ff-h2" placeholder="שם — 50%"/></div></div>
+      <div class="fr"><div class="fg"><label class="fl">מנהל עיזבון</label><input class="fi" id="ff-exec"/></div><div class="fg"><label class="fl">שכ"ט (₪)</label><input class="fi" id="ff-fee" type="number"/></div></div>
+      <div class="form-actions"><button class="btn-sec" onclick="closeForm()">ביטול</button><button class="btn-pri" onclick="saveForm('will')">פתח תיק</button></div>`
+  };
+  document.getElementById('formCard').innerHTML=templates[mod]||'';
+  document.getElementById('formCard').dataset.mod=mod;
+  document.getElementById('formOverlay').classList.add('open');
+  // init type selection
+  if(mod==='tx')setFFT('sell');
+  if(mod==='lit')setFFT('pinuy');
+  if(mod==='will')setFFT('edim');
+}
+function closeForm(){document.getElementById('formOverlay').classList.remove('open');}
+
+let ffType='sell';
+function setFFT(t){
+  ffType=t;
+  document.querySelectorAll('[id^="fft-"]').forEach(el=>{el.className='type-opt';});
+  const el=document.getElementById('fft-'+t);
+  if(el)el.className='type-opt sel-'+t.replace('pinuy','pinuy').replace('piruk','piruk');
+}
+
+function saveForm(mod){
+  const name=document.getElementById('ff-name')?.value.trim();
+  if(!name){alert('שם הוא שדה חובה');return;}
+  const now=new Date().toLocaleDateString('he-IL');
+  const id=Date.now();
+  let newCase={id,name,created:now,stage:1,notes:'',timeline:[{t:'פתיחת תיק',d:now,c:'gold'}]};
+  const g=id=>document.getElementById(id)?.value.trim()||'';
+  const gn=id=>Number(document.getElementById(id)?.value)||0;
+
+  if(mod==='reg'){Object.assign(newCase,{phone:g('ff-phone'),address:g('ff-address'),gush:g('ff-gush'),helka:g('ff-helka'),fee:gn('ff-fee'),opposing:g('ff-opposing'),docs:{mashabah:'missing',masrehisha:'missing',iriya:'missing',vaada:'missing',shtarot:'missing',bank:'missing',hazaara:'missing'}});}
+  if(mod==='tx'){Object.assign(newCase,{type:ffType,phone:g('ff-phone'),address:g('ff-address'),gush:g('ff-gush'),helka:g('ff-helka'),price:gn('ff-price'),fee:gn('ff-fee'),opposing:g('ff-opposing'),deadline:g('ff-deadline'),docs:{nasah:'missing',zchuyot:'missing',mashabah:'missing',masrehisha:'missing',iriya:'missing',mashneta:'missing',yipuy:'missing',heskem:'missing',tashlumim:'missing',tz:'missing'},payments:[{label:'מקדמה 10%',amount:Math.round(gn('ff-price')*0.1),paid:false,date:'—'},{label:'יתרה 90%',amount:Math.round(gn('ff-price')*0.9),paid:false,date:'—'}]});}
+  if(mod==='poa'){Object.assign(newCase,{phone:g('ff-phone'),idNum:g('ff-id'),address:g('ff-address'),attorneys:[{name:g('ff-atty1'),rel:g('ff-rel1'),order:'ראשי',scopes:{medical:true,financial:true,personal:false}}],scopes:{medical:true,financial:true,personal:false},instructions:'',medicalNotes:'',fee:gn('ff-fee'),status:'pending',signDate:'',filingDate:'',filingRef:''});}
+  if(mod==='will'){const h1=g('ff-h1'),h2=g('ff-h2');const heirs=[];if(h1){const m=h1.match(/(\d+)/);heirs.push({name:h1.replace(/\s*—\s*\d+%/,'').trim(),rel:'יורש',share:m?parseInt(m[1]):50});}if(h2){const m=h2.match(/(\d+)/);heirs.push({name:h2.replace(/\s*—\s*\d+%/,'').trim(),rel:'יורש',share:m?parseInt(m[1]):50});}Object.assign(newCase,{type:ffType,phone:g('ff-phone'),idNum:g('ff-id'),address:g('ff-address'),heirs,assets:[],executor:g('ff-exec'),witnesses:[],fee:gn('ff-fee'),status:'draft',signDate:'',filingDate:'',filingRef:''});}
+  if(mod==='lit'){Object.assign(newCase,{type:ffType,subtype:'',phone:g('ff-phone'),subject:g('ff-subject'),court:g('ff-court'),caseNum:g('ff-casenum'),opposingParty:g('ff-party'),opposingAtty:g('ff-opposing'),claim:gn('ff-claim'),fee:gn('ff-fee'),verdict:'open',briefs:{kb_claim:'missing',kb_counter:'missing',kb_motion:'missing',kb_affidav:'missing',kb_expert:'missing',kb_summ:'missing'},hearings:[]});}
+
+  DB[mod].unshift(newCase);
+  closeForm();
+  switchModule(mod);
+  selectCase(mod,id);
+  renderDash();
+}
+
+// ============================================================
+// DELETE
+// ============================================================
+function deleteCase(mod,id){
+  const c=DB[mod].find(x=>x.id===id);
+  if(!c)return;
+  if(!confirm('למחוק את תיק "'+c.name+'"?\nפעולה זו לא ניתנת לביטול.'))return;
+  DB[mod]=DB[mod].filter(x=>x.id!==id);
+  selected[mod]=null;
+  document.getElementById('ca-'+mod).innerHTML='<div class="empty-state"><div class="empty-icon">'+{reg:'📋',tx:'🤝',poa:'📄',will:'📜',lit:'⚖️'}[mod]+'</div><div>בחר תיק מהרשימה או פתח חדש</div></div>';
+  render(mod);
+  renderDash();
+}
+
+// ============================================================
+// INIT
+// ============================================================
+// init filter buttons
+['tx','will','lit'].forEach(mod=>{
+  const allBtn=document.getElementById('tf-'+mod+'-all');
+  if(allBtn)allBtn.className='fb act-all';
+});
+renderDash();
+</script>
+</body>
+</html>
