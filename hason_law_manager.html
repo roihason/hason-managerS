@@ -601,9 +601,9 @@ function renderDash(){
   document.getElementById('dash-hearings').innerHTML=upcoming.slice(0,5).map(h=>{
     const days=Math.ceil((new Date(h.date)-today)/(1000*60*60*24));
     const urgent=days<=7;
-    return`<div class="ds-item" onclick="switchModule('\${h.mod}');selectCase('\${h.mod}',\${h.cid})">
-      <div><div class="dsi-name">\${h.name}</div><div class="dsi-sub">\${h.type}</div></div>
-      <span class="dsi-badge pill \${urgent?'red':'amber'}">\${urgent?'⚡ '+days+' ימים':new Date(h.date).toLocaleDateString('he-IL')}</span>
+    return`<div class="ds-item" onclick="switchModule('${h.mod}');selectCase('${h.mod}',${h.cid})">
+      <div><div class="dsi-name">${h.name}</div><div class="dsi-sub">${h.type}</div></div>
+      <span class="dsi-badge pill ${urgent?'red':'amber'}">${urgent?'⚡ '+days+' ימים':new Date(h.date).toLocaleDateString('he-IL')}</span>
     </div>`;
   }).join('')||'<div style="padding:14px 18px;color:var(--text-dimmer);font-size:13px">אין מועדים קרובים</div>';
   // urgent tx
@@ -762,20 +762,20 @@ function renderTabContent(mod,c){
     };
     return`<div class="sec">
       <div class="sec-title">מועדים קריטיים</div>
-      \${sorted.length?sorted.map((d,i)=>{
+      ${sorted.length?sorted.map((d,i)=>{
         const dDate=new Date(d.date);
         const days=Math.ceil((dDate-today)/(1000*60*60*24));
         const passed=days<0;
         const urgent=!passed&&days<=7;
         const color=typeColors[d.type]||'gold';
-        return`<div class="card" style="display:flex;align-items:center;gap:12px;border-right:3px solid var(--\${color});margin-bottom:8px;cursor:pointer" onclick="removeDeadline('tx',\${c.id},\${i})">
+        return`<div class="card" style="display:flex;align-items:center;gap:12px;border-right:3px solid var(--${color});margin-bottom:8px;cursor:pointer" onclick="removeDeadline('tx',${c.id},${i})">
           <div style="flex:1">
-            <div style="font-size:13px;font-weight:600">\${d.type}</div>
-            <div style="font-size:11px;color:var(--text-dimmer);margin-top:2px">\${d.note||''}</div>
+            <div style="font-size:13px;font-weight:600">${d.type}</div>
+            <div style="font-size:11px;color:var(--text-dimmer);margin-top:2px">${d.note||''}</div>
           </div>
           <div style="text-align:left">
-            <div style="font-size:15px;font-weight:700;color:var(--\${color})">\${dDate.toLocaleDateString('he-IL')}</div>
-            <div style="font-size:11px;font-weight:600;color:\${passed?'var(--red)':urgent?'var(--amber)':'var(--text-dimmer)'}">\${passed?'עבר לפני '+Math.abs(days)+' ימים':days===0?'היום!':urgent?'בעוד '+days+' ימים':'בעוד '+days+' ימים'}</div>
+            <div style="font-size:15px;font-weight:700;color:var(--${color})">${dDate.toLocaleDateString('he-IL')}</div>
+            <div style="font-size:11px;font-weight:600;color:${passed?'var(--red)':urgent?'var(--amber)':'var(--text-dimmer)'}">${passed?'עבר לפני '+Math.abs(days)+' ימים':days===0?'היום!':urgent?'בעוד '+days+' ימים':'בעוד '+days+' ימים'}</div>
           </div>
           <div style="font-size:16px;cursor:pointer;color:var(--text-dimmer)" title="מחק">×</div>
         </div>`;
@@ -783,7 +783,7 @@ function renderTabContent(mod,c){
       <div class="card" style="margin-top:8px">
         <div style="font-size:11px;font-weight:600;color:var(--text-dim);text-transform:uppercase;margin-bottom:10px">+ הוסף מועד</div>
         <div class="fr" style="margin-bottom:8px">
-          <select class="fi" id="dl-type-tx-\${c.id}">
+          <select class="fi" id="dl-type-tx-${c.id}">
             <option>תשלום מקדמה</option>
             <option>תשלום סיום</option>
             <option>מסירת חזקה</option>
@@ -792,10 +792,10 @@ function renderTabContent(mod,c){
             <option>פירעון משכנתא</option>
             <option>אחר</option>
           </select>
-          <input class="fi" type="date" id="dl-date-tx-\${c.id}"/>
+          <input class="fi" type="date" id="dl-date-tx-${c.id}"/>
         </div>
-        <input class="fi" id="dl-note-tx-\${c.id}" placeholder="הערה (אופציונלי)" style="margin-bottom:8px"/>
-        <button class="btn-pri" style="width:100%;padding:8px" onclick="addDeadline('tx',\${c.id})">הוסף מועד</button>
+        <input class="fi" id="dl-note-tx-${c.id}" placeholder="הערה (אופציונלי)" style="margin-bottom:8px"/>
+        <button class="btn-pri" style="width:100%;padding:8px" onclick="addDeadline('tx',${c.id})">הוסף מועד</button>
       </div>
     </div>`;
   }
@@ -810,28 +810,28 @@ function renderTabContent(mod,c){
     };
     return`<div class="sec">
       <div class="sec-title">מועדים קריטיים</div>
-      \${sorted.length?sorted.map((d,i)=>{
+      ${sorted.length?sorted.map((d,i)=>{
         const dDate=new Date(d.date);
         const days=Math.ceil((dDate-today)/(1000*60*60*24));
         const passed=days<0;
         const urgent=!passed&&days<=14;
         const color=typeColors[d.type]||'gold';
-        return`<div class="card" style="display:flex;align-items:center;gap:12px;border-right:3px solid var(--\${color});margin-bottom:8px">
+        return`<div class="card" style="display:flex;align-items:center;gap:12px;border-right:3px solid var(--${color});margin-bottom:8px">
           <div style="flex:1">
-            <div style="font-size:13px;font-weight:600">\${d.type}</div>
-            <div style="font-size:11px;color:var(--text-dimmer);margin-top:2px">\${d.note||''}</div>
+            <div style="font-size:13px;font-weight:600">${d.type}</div>
+            <div style="font-size:11px;color:var(--text-dimmer);margin-top:2px">${d.note||''}</div>
           </div>
           <div style="text-align:left">
-            <div style="font-size:15px;font-weight:700;color:var(--\${color})">\${dDate.toLocaleDateString('he-IL')}</div>
-            <div style="font-size:11px;font-weight:600;color:\${passed?'var(--red)':urgent?'var(--amber)':'var(--text-dimmer)'}">\${passed?'עבר לפני '+Math.abs(days)+' ימים':days===0?'היום!':urgent?'⚡ בעוד '+days+' ימים':'בעוד '+days+' ימים'}</div>
+            <div style="font-size:15px;font-weight:700;color:var(--${color})">${dDate.toLocaleDateString('he-IL')}</div>
+            <div style="font-size:11px;font-weight:600;color:${passed?'var(--red)':urgent?'var(--amber)':'var(--text-dimmer)'}">${passed?'עבר לפני '+Math.abs(days)+' ימים':days===0?'היום!':urgent?'⚡ בעוד '+days+' ימים':'בעוד '+days+' ימים'}</div>
           </div>
-          <div style="font-size:16px;cursor:pointer;color:var(--text-dimmer)" onclick="removeDeadline('lit',\${c.id},\${i})" title="מחק">×</div>
+          <div style="font-size:16px;cursor:pointer;color:var(--text-dimmer)" onclick="removeDeadline('lit',${c.id},${i})" title="מחק">×</div>
         </div>`;
       }).join(''):'<div style="color:var(--text-dimmer);font-size:13px;padding:10px 0">אין מועדים רשומים</div>'}
       <div class="card" style="margin-top:8px">
         <div style="font-size:11px;font-weight:600;color:var(--text-dim);text-transform:uppercase;margin-bottom:10px">+ הוסף מועד</div>
         <div class="fr" style="margin-bottom:8px">
-          <select class="fi" id="dl-type-lit-\${c.id}">
+          <select class="fi" id="dl-type-lit-${c.id}">
             <option>דיון</option>
             <option>הגשת כתב טענות</option>
             <option>הגשת תצהירות</option>
@@ -841,10 +841,10 @@ function renderTabContent(mod,c){
             <option>תשובה לכתב טענות</option>
             <option>אחר</option>
           </select>
-          <input class="fi" type="date" id="dl-date-lit-\${c.id}"/>
+          <input class="fi" type="date" id="dl-date-lit-${c.id}"/>
         </div>
-        <input class="fi" id="dl-note-lit-\${c.id}" placeholder="הערה — שם שופט, אולם, נושא..." style="margin-bottom:8px"/>
-        <button class="btn-pri" style="width:100%;padding:8px" onclick="addDeadline('lit',\${c.id})">הוסף מועד</button>
+        <input class="fi" id="dl-note-lit-${c.id}" placeholder="הערה — שם שופט, אולם, נושא..." style="margin-bottom:8px"/>
+        <button class="btn-pri" style="width:100%;padding:8px" onclick="addDeadline('lit',${c.id})">הוסף מועד</button>
       </div>
     </div>`;
   }
