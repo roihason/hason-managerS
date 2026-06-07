@@ -1746,15 +1746,122 @@ function deleteLead(id){
 
 function convertLeadToCase(id){
   const l=DB.leads.find(x=>x.id===id);
-  const mod=prompt('המר לאיזה תיק?\nreg=רישום | tx=עסקה | poa=יפוי כוח | will=צוואה | lit=ליטיגציה');
-  if(!['reg','tx','poa','will','lit'].includes(mod))return;
-  l.status='closed';
-  l.timeline=l.timeline||[];
-  l.timeline.push({t:'הומר לתיק פעיל — '+{reg:'רישום',tx:'עסקה',poa:'יפוי כוח',will:'צוואה',lit:'ליטיגציה'}[mod],d:new Date().toLocaleDateString('he-IL'),c:'green'});
-  saveDB();renderLeads();renderLeadContent();
-  // Open new case form in target module
+  if(!l)return;
+
+  // Build conversion modal
+  const modalHTML=`<div id="convertModal" style="
+    position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:99999;
+    display:flex;align-items:center;justify-content:center;font-family:'Heebo',sans-serif;direction:rtl">
+    <div style="background:#fff;border-radius:12px;padding:24px;width:400px;max-width:92vw;box-shadow:0 8px 32px rgba(0,0,0,0.2)">
+      <div style="font-size:16px;font-weight:700;color:#1A1A1A;margin-bottom:6px">המר ליד לתיק פעיל</div>
+      <div style="font-size:13px;color:#888;margin-bottom:20px">${l.name} — ${l.service||''}</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:20px">
+        ${[
+          {mod:'reg',    icon:'📋', label:'רישום מקרקעין'},
+          {mod:'tx',     icon:'🤝', label:'עסקת מכר/רכישה'},
+          {mod:'poa',    icon:'📄', label:'יפוי כוח מתמשך'},
+          {mod:'will',   icon:'📜', label:'צוואה'},
+          {mod:'lit',    icon:'⚖️', label:'ליטיגציה'},
+          {mod:'notary', icon:'🏛', label:'נוטריון'}
+        ].map(o=>`<button onclick="doConvertLead(${id},'${o.mod}')" style="
+          padding:12px 8px;border:2px solid #e0e0e0;border-radius:8px;background:#fff;
+          cursor:pointer;font-family:'Heebo',sans-serif;font-size:13px;font-weight:600;
+          color:#555;transition:all 0.2s;text-align:center"
+          onmouseover="this.style.borderColor='#B8860B';this.style.color='#B8860B';this.style.background='rgba(184,134,11,0.05)'"
+          onmouseout="this.style.borderColor='#e0e0e0';this.style.color='#555';this.style.background='#fff'">
+          <div style="font-size:22px;margin-bottom:4px">${o.icon}</div>
+          <div>${o.label}</div>
+        </button>`).join('')}
+      </div>
+      <button onclick="document.getElementById('convertModal').remove()" style="
+        width:100%;padding:10px;border:1px solid #e0e0e0;border-radius:8px;
+        background:#fff;cursor:pointer;font-family:'Heebo',sans-serif;font-size:13px;color:#888">
+        ביטול
+      </button>
+    </div>
+  </div>`;
+
+  document.body.insertAdjacentHTML('beforeend', modalHTML);
+}
+
+function doConvertLead(leadId, mod){
+  const l=DB.leads.find(x=>x.id===leadId);
+  if(!l)return;
+  document.getElementById('convertModal')?.remove();
+
+  // Create case directly with lead details — no form needed
+  const now=new Date().toLocaleDateString('he-IL');
+  const id=Date.now();
+  const modLabels={reg:'רישום',tx:'עסקה',poa:'יפוי כוח',will:'צוואה',lit:'ליטיגציה',notary:'נוטריון'};
+  let newCase=null;
+
+  if(mod==='reg'){
+    const regDocs=getRegDocs({subtype:'tabu'});
+    const docsObj={};regDocs.forEach(d=>docsObj[d.id]='missing');
+    newCase={id,name:l.name,phone:l.phone||'',address:'',gush:'',helka:'',fee:0,opposing:'',
+      subtype:'tabu',docs:docsObj,notes:'הומר מליד. '+( l.notes||''),stage:1,created:now,
+      timeline:[{t:'תיק נפתח מהמרת ליד',d:now,c:'gold'},{t:'ליד מקורי: '+(l.service||''),d:now,c:'teal'}]};
+    DB.reg.unshift(newCase);
+  }
+  else if(mod==='tx'){
+    newCase={id,type:'sell',name:l.name,phone:l.phone||'',address:'',gush:'',helka:'',
+      price:0,fee:0,opposing:'',deadline:'',stage:1,deadlines:[],
+      docs:{nasah:'missing',zchuyot:'missing',mashabah:'missing',masrehisha:'missing',iriya:'missing',mashneta:'missing',yipuy:'missing',heskem:'missing',tashlumim:'missing',tz:'missing'},
+      payments:[],notes:'הומר מליד. '+(l.notes||''),created:now,
+      timeline:[{t:'תיק נפתח מהמרת ליד',d:now,c:'gold'}]};
+    DB.tx.unshift(newCase);
+  }
+  else if(mod==='poa'){
+    newCase={id,name:l.name,phone:l.phone||'',idNum:'',address:'',
+      attorneys:[],scopes:{medical:false,financial:false,personal:false},
+      instructions:'',medicalNotes:'',fee:0,stage:1,status:'pending',
+      signDate:'',filingDate:'',filingRef:'',
+      notes:'הומר מליד. '+(l.notes||''),created:now,
+      timeline:[{t:'תיק נפתח מהמרת ליד',d:now,c:'gold'}]};
+    DB.poa.unshift(newCase);
+  }
+  else if(mod==='will'){
+    newCase={id,type:'edim',name:l.name,phone:l.phone||'',idNum:'',address:'',
+      heirs:[],assets:[],executor:'',witnesses:[],fee:0,stage:1,status:'draft',
+      signDate:'',filingDate:'',filingRef:'',
+      notes:'הומר מליד. '+(l.notes||''),created:now,
+      timeline:[{t:'תיק נפתח מהמרת ליד',d:now,c:'gold'}]};
+    DB.will.unshift(newCase);
+  }
+  else if(mod==='lit'){
+    newCase={id,type:'money',subtype:'',name:l.name,phone:l.phone||'',
+      subject:l.service||'',court:'',caseNum:'',opposingParty:'',opposingAtty:'',
+      claim:0,fee:0,verdict:'open',procedure:'',deadlines:[],
+      briefs:{kb_claim:'missing',kb_counter:'missing',kb_motion:'missing',kb_affidav:'missing',kb_expert:'missing',kb_summ:'missing'},
+      hearings:[],notes:'הומר מליד. '+(l.notes||''),created:now,
+      timeline:[{t:'תיק נפתח מהמרת ליד',d:now,c:'gold'}]};
+    DB.lit.unshift(newCase);
+  }
+  else if(mod==='notary'){
+    newCase={id,name:l.name,phone:l.phone||'',idNum:'',subtype:'other',
+      notes2:l.service||'',notes:'הומר מליד. '+(l.notes||''),
+      fee:0,stage:1,status:'בהכנה',authDate:'',created:now,
+      timeline:[{t:'תיק נפתח מהמרת ליד',d:now,c:'gold'}]};
+    DB.notary.unshift(newCase);
+  }
+
+  if(!newCase)return;
+
+  // Remove lead from DB
+  DB.leads=DB.leads.filter(x=>x.id!==leadId);
+
+  saveDB();renderDash();
   switchModule(mod);
-  setTimeout(()=>openForm(mod),100);
+  setTimeout(()=>{
+    render(mod);
+    selectCase(mod,id);
+    // Show success message
+    const msg=document.createElement('div');
+    msg.style.cssText='position:fixed;bottom:20px;left:20px;background:#2E8B57;color:#fff;padding:10px 18px;border-radius:8px;font-size:13px;font-weight:600;font-family:Heebo,sans-serif;z-index:9999';
+    msg.textContent='✓ תיק נפתח בהצלחה מהליד';
+    document.body.appendChild(msg);
+    setTimeout(()=>msg.remove(),3000);
+  },150);
 }
 
 function setLeadFilter(f){
