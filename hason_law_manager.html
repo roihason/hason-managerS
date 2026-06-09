@@ -1687,396 +1687,69 @@ function saveForm(mod){
     const docsObj={};regDocs.forEach(d=>docsObj[d.id]='missing');
     Object.assign(newCase,{subtype,phone:g('ff-phone'),address:g('ff-address'),gush:g('ff-gush'),helka:g('ff-helka'),fee:gn('ff-fee'),opposing:g('ff-opposing'),docs:docsObj});
   }
-  if(mod==='tx'){const txType=g('ff-tx-type-new')||'sell';Object.assign(newCase,{type:txType,deadlines:[],phone:g('ff-phone'),address:g('ff-address'),gush:g('ff-gush'),helka:g('ff-helka'),price:gn('ff-price'),fee:gn('ff-fee'),opposing:g('ff-opposing'),deadline:g('ff-deadline'),docs:{nasah:'missing',zchuyot:'missing',mashabah:'missing',masrehisha:'missing',iriya:'missing',mashneta:'missing',yipuy:'missing',heskem:'missing',tashlumim:'missing',tz:'missing'},payments:[{label:'מקדמה 10%',amount:Math.round(gn('ff-price')*0.1),paid:false,date:'—'},{label:'יתרה 90%',amount:Math.round(gn('ff-price')*0.9),paid:false,date:'—'}]});}
-  if(mod==='poa'){Object.assign(newCase,{phone:g('ff-phone'),idNum:g('ff-id'),address:g('ff-address'),attorneys:[{name:g('ff-atty1'),rel:g('ff-rel1'),order:'ראשי',scopes:{medical:true,financial:true,personal:false}}],scopes:{medical:true,financial:true,personal:false},instructions:'',medicalNotes:'',fee:gn('ff-fee'),status:'pending',signDate:'',filingDate:'',filingRef:''});}
-  if(mod==='will'){const h1=g('ff-h1'),h2=g('ff-h2');const heirs=[];if(h1){const m=h1.match(/(\d+)/);heirs.push({name:h1.replace(/\s*—\s*\d+%/,'').trim(),rel:'יורש',share:m?parseInt(m[1]):50});}if(h2){const m=h2.match(/(\d+)/);heirs.push({name:h2.replace(/\s*—\s*\d+%/,'').trim(),rel:'יורש',share:m?parseInt(m[1]):50});}Object.assign(newCase,{type:ffType,phone:g('ff-phone'),idNum:g('ff-id'),address:g('ff-address'),heirs,assets:[],executor:g('ff-exec'),witnesses:[],fee:gn('ff-fee'),status:'draft',signDate:'',filingDate:'',filingRef:''});}
-  if(mod==='lit'){const litType=document.getElementById('ff-lit-type-new')?.value||'kessef';Object.assign(newCase,{type:litType,subtype:'',phone:g('ff-phone'),subject:g('ff-subject'),court:g('ff-court'),caseNum:g('ff-casenum'),opposingParty:g('ff-party'),opposingAtty:g('ff-opposing'),claim:gn('ff-claim'),fee:gn('ff-fee'),verdict:'open',deadlines:[],briefs:{kb_claim:'missing',kb_counter:'missing',kb_motion:'missing',kb_affidav:'missing',kb_expert:'missing',kb_summ:'missing'},hearings:[]});}
-
-  if(mod==='other'){
-    const ost=OTHER_SUBTYPES[c.subtype]||OTHER_SUBTYPES.other;
-    stageName=OTHER_STAGES[c.stage-1]||'';
-    sub=c.description||c.name;
-    progress=Math.round((c.stage/OTHER_STAGES.length)*100);
-    pills=`<span class="pill ${ost.color}">${ost.label}</span><span class="pill gold">${stageName}</span>`;
+  else if(mod==='tx'){
+    const txType=g('ff-tx-type-new')||'sell';
+    Object.assign(newCase,{type:txType,deadlines:[],phone:g('ff-phone'),address:g('ff-address'),gush:g('ff-gush'),helka:g('ff-helka'),price:gn('ff-price'),fee:gn('ff-fee'),opposing:g('ff-opposing'),deadline:g('ff-deadline'),
+      docs:{nasah:'missing',zchuyot:'missing',mashabah:'missing',masrehisha:'missing',iriya:'missing',mashneta:'missing',yipuy:'missing',heskem:'missing',tashlumim:'missing',tz:'missing'},
+      payments:[{label:'מקדמה 10%',amount:Math.round(gn('ff-price')*0.1),paid:false,date:'—'},{label:'יתרה 90%',amount:Math.round(gn('ff-price')*0.9),paid:false,date:'—'}]});
   }
-  if(mod==='other'){
-    const newOther={id,name:g('ff-name'),phone:g('ff-phone'),idNum:g('ff-id'),fee:gn('ff-fee'),
-      subtype:g('ff-other-subtype')||'other',description:g('ff-description'),
-      notes:'',status:'פתוח',stage:1,created:now,
-      timeline:[{t:'פתיחת תיק',d:now,c:'gold'}]};
-    DB.other.unshift(newOther);
-    closeForm();switchModule('other');
-    setTimeout(()=>{render('other');selectCase('other',id);},50);
-    saveDB();renderDash();return;
+  else if(mod==='poa'){
+    Object.assign(newCase,{phone:g('ff-phone'),idNum:g('ff-id'),address:g('ff-address'),
+      attorneys:[{name:g('ff-atty1'),rel:g('ff-rel1'),order:'ראשי',scopes:{medical:true,financial:true,personal:false}}],
+      scopes:{medical:true,financial:true,personal:false},instructions:'',medicalNotes:'',
+      fee:gn('ff-fee'),status:'pending',signDate:'',filingDate:'',filingRef:''});
   }
-  if(mod==='notary'){
-    const nst=NOTARY_SUBTYPES[c.subtype]||NOTARY_SUBTYPES.other;
-    const stages=getNotaryStages(c);
-    stageName=stages[c.stage-1]||'';
-    sub=c.address||c.docType||'';
-    progress=Math.round((c.stage/stages.length)*100);
-    pills=`<span class="pill ${nst.color}">${nst.label}</span><span class="pill gold">${stageName}</span>`;
+  else if(mod==='will'){
+    const h1=g('ff-h1'),h2=g('ff-h2');const heirs=[];
+    if(h1){const m=h1.match(/(\d+)/);heirs.push({name:h1.replace(/\s*—\s*\d+%/,'').trim(),rel:'יורש',share:m?parseInt(m[1]):50});}
+    if(h2){const m=h2.match(/(\d+)/);heirs.push({name:h2.replace(/\s*—\s*\d+%/,'').trim(),rel:'יורש',share:m?parseInt(m[1]):50});}
+    Object.assign(newCase,{type:ffType||'edim',phone:g('ff-phone'),idNum:g('ff-id'),address:g('ff-address'),
+      heirs,assets:[],executor:g('ff-exec'),witnesses:[],fee:gn('ff-fee'),
+      status:'draft',signDate:'',filingDate:'',filingRef:''});
   }
-  if(mod==='other'){
-    const ost=OTHER_SUBTYPES[c.subtype]||OTHER_SUBTYPES.other;
-    stageName=OTHER_STAGES[c.stage-1]||'';
-    sub=c.description||c.name;
-    progress=Math.round((c.stage/OTHER_STAGES.length)*100);
-    pills=`<span class="pill ${ost.color}">${ost.label}</span><span class="pill gold">${stageName}</span>`;
+  else if(mod==='lit'){
+    const litType=document.getElementById('ff-lit-type-new')?.value||'money';
+    Object.assign(newCase,{type:litType,subtype:'',phone:g('ff-phone'),subject:g('ff-subject'),
+      court:g('ff-court'),caseNum:g('ff-casenum'),opposingParty:g('ff-party'),opposingAtty:g('ff-opposing'),
+      claim:gn('ff-claim'),fee:gn('ff-fee'),verdict:'open',deadlines:[],procedure:'',
+      briefs:{kb_claim:'missing',kb_counter:'missing',kb_motion:'missing',kb_affidav:'missing',kb_expert:'missing',kb_summ:'missing'},
+      hearings:[]});
   }
-  if(mod==='other'){
-    const newOther={id,name:g('ff-name'),phone:g('ff-phone'),idNum:g('ff-id'),fee:gn('ff-fee'),
-      subtype:g('ff-other-subtype')||'other',description:g('ff-description'),
-      notes:'',status:'פתוח',stage:1,created:now,
-      timeline:[{t:'פתיחת תיק',d:now,c:'gold'}]};
-    DB.other.unshift(newOther);
-    closeForm();switchModule('other');
-    setTimeout(()=>{render('other');selectCase('other',id);},50);
-    saveDB();renderDash();return;
-  }
-  if(mod==='notary'){
-    const subtype=g('ff-notary-subtype')||'other';
-    const newNotary={id,name:g('ff-name'),phone:g('ff-phone'),idNum:g('ff-id'),fee:gn('ff-fee'),
-      subtype,notes2:g('ff-notes2'),notes:'',status:'בהכנה',stage:1,authDate:'',
-      created:new Date().toLocaleDateString('he-IL'),
-      timeline:[{t:'פתיחת תיק נוטריון',d:new Date().toLocaleDateString('he-IL'),c:'gold'}]};
+  else if(mod==='notary'){
+    const newNotary={id,name,phone:g('ff-phone'),idNum:g('ff-id'),fee:gn('ff-fee'),
+      subtype:g('ff-notary-subtype')||'other',notes2:g('ff-notes2'),
+      notes:'',status:'בהכנה',stage:1,authDate:'',created:now,
+      timeline:[{t:'פתיחת תיק נוטריון',d:now,c:'gold'}]};
     DB.notary.unshift(newNotary);
     closeForm();switchModule('notary');
     setTimeout(()=>{render('notary');selectCase('notary',id);},50);
     saveDB();renderDash();return;
   }
-  if(mod==='leads'){
-    const newLead={id,name,phone:g('ff-phone'),service:g('ff-service'),source:g('ff-source'),notes:g('ff-notes'),status:'new',created:new Date().toLocaleDateString('he-IL'),timeline:[{t:'ליד נפתח',d:new Date().toLocaleDateString('he-IL'),c:'blue'}]};
-    DB.leads.unshift(newLead);
-    closeForm();
-    switchModule('leads');
-    setTimeout(()=>{renderLeads();selectLead(id);},50);
-    saveDB();renderDash();
-    return;
-  }
-  DB[mod].unshift(newCase);
-  closeForm();
-  switchModule(mod);
-  selectCase(mod,id);
-  renderDash();
-}
-
-// ============================================================
-// DELETE
-// ============================================================
-function setLitProcedure(id,proc){
-  const c=DB.lit.find(x=>x.id===id);
-  if(!c)return;
-  c.procedure=proc;
-  c.timeline=c.timeline||[];
-  c.timeline.push({t:'מסגרת דיונית: '+LIT_PROCEDURES[proc].label,d:new Date().toLocaleDateString('he-IL'),c:'blue'});
-  saveDB();renderContent('lit');
-}
-
-function autoAddDeadlines(id){
-  const c=DB.lit.find(x=>x.id===id);
-  if(!c||!c.procedure)return;
-  const proc=LIT_PROCEDURES[c.procedure];
-  if(!proc)return;
-  const startDate=prompt('תאריך הגשת כתב התביעה (YYYY-MM-DD):');
-  if(!startDate)return;
-  if(!c.deadlines)c.deadlines=[];
-  const base=new Date(startDate);
-  proc.deadlines.forEach(d=>{
-    const dDate=new Date(base);
-    dDate.setDate(dDate.getDate()+d.days);
-    c.deadlines.push({
-      type:d.event,
-      date:dDate.toISOString().split('T')[0],
-      note:d.from+' + '+d.days+' ימים'
-    });
-  });
-  c.timeline=c.timeline||[];
-  c.timeline.push({t:'מועדים נוספו אוטומטית — '+proc.label,d:new Date().toLocaleDateString('he-IL'),c:'amber'});
-  saveDB();renderContent('lit');
-}
-
-function addDeadline(mod,id){
-  const c=DB[mod].find(x=>x.id===id);
-  if(!c.deadlines)c.deadlines=[];
-  const type=document.getElementById('dl-type-'+mod+'-'+id)?.value;
-  const date=document.getElementById('dl-date-'+mod+'-'+id)?.value;
-  const note=document.getElementById('dl-note-'+mod+'-'+id)?.value||'';
-  if(!date){alert('נא לבחור תאריך');return;}
-  c.deadlines.push({type,date,note});
-  c.timeline=c.timeline||[];
-  c.timeline.push({t:'מועד נוסף: '+type,d:new Date().toLocaleDateString('he-IL'),c:'amber'});
-  saveDB();renderContent(mod);
-}
-
-function removeDeadline(mod,id,idx){
-  const c=DB[mod].find(x=>x.id===id);
-  if(!c.deadlines)return;
-  if(!confirm('למחוק מועד זה?'))return;
-  c.deadlines.splice(idx,1);
-  saveDB();renderContent(mod);
-}
-
-function deleteCase(mod,id){
-  const c=DB[mod].find(x=>x.id===id);
-  if(!c)return;
-  if(!confirm('למחוק את תיק "'+c.name+'"?\nפעולה זו לא ניתנת לביטול.'))return;
-  DB[mod]=DB[mod].filter(x=>x.id!==id);
-  selected[mod]=null;
-  document.getElementById('ca-'+mod).innerHTML='<div class="empty-state"><div class="empty-icon">'+{reg:'📋',tx:'🤝',poa:'📄',will:'📜',lit:'⚖️'}[mod]+'</div><div>בחר תיק מהרשימה או פתח חדש</div></div>';
-  render(mod);
-  renderDash();
-}
-
-// ============================================================
-// LEADS
-// ============================================================
-const LEAD_STAGES = ['פנייה נכנסת','שיחה','פגישה','הצעת מחיר','סגירה'];
-const LEAD_SOURCES = ['המלצה','אתר אינטרנט','גוגל','פייסבוק','לקוח חוזר','אחר'];
-const LEAD_SERVICES = ['רישום מקרקעין','עסקת מכר','עסקת רכישה','יפוי כוח מתמשך','צוואה','ליטיגציה','אחר'];
-const LEAD_STATUS = {
-  new:{label:'פנייה חדשה',color:'blue'},
-  contact:{label:'בשיחה',color:'amber'},
-  meeting:{label:'פגישה נקבעה',color:'purple'},
-  quote:{label:'הצעת מחיר',color:'teal'},
-  closed:{label:'נסגר ✓',color:'green'},
-  lost:{label:'נדחה',color:'red'}
-};
-
-let selectedLead = null;
-let leadFilter = 'all';
-
-function renderLeads(){
-  const search=(document.getElementById('s-leads')?.value||'').toLowerCase();
-  const filtered=DB.leads.filter(l=>{
-    const ms=l.name.toLowerCase().includes(search)||(l.phone||'').includes(search);
-    const mt=leadFilter==='all'||l.status===leadFilter;
-    return ms&&mt;
-  });
-  document.getElementById('b-leads').textContent=DB.leads.length;
-  document.getElementById('list-leads').innerHTML=filtered.map(l=>{
-    const st=LEAD_STATUS[l.status]||LEAD_STATUS.new;
-    return`<div class="case-item${selectedLead===l.id?' active':''}" onclick="selectLead(${l.id})">
-      <div class="ci-top"><div class="ci-name">${l.name}</div><div class="ci-date">${l.created}</div></div>
-      <div class="ci-sub">${l.service||'—'} | ${l.source||'—'}</div>
-      <div class="ci-bottom">
-        <span class="pill ${st.color}">${st.label}</span>
-        <span style="font-size:11px;color:var(--text-dimmer)">${l.phone||''}</span>
-      </div>
-    </div>`;
-  }).join('')||'<div style="padding:18px;text-align:center;color:var(--text-dimmer);font-size:13px">אין לידים</div>';
-}
-
-function selectLead(id){
-  selectedLead=id;
-  renderLeads();
-  renderLeadContent();
-}
-
-function renderLeadContent(){
-  const l=DB.leads.find(x=>x.id===selectedLead);
-  if(!l)return;
-  const st=LEAD_STATUS[l.status]||LEAD_STATUS.new;
-  const ca=document.getElementById('ca-leads');
-
-  const statusBtns=Object.entries(LEAD_STATUS).map(([k,v])=>
-    `<button class="ss-btn${l.status===k?' act-'+v.color:''}"
-      style="${l.status===k?`border-color:var(--${v.color});color:var(--${v.color});background:var(--${v.color}-dim)`:''}"
-      onclick="setLeadStatus(${l.id},'${k}')">${v.label}</button>`
-  ).join('');
-
-  ca.innerHTML=`
-    <div class="case-header">
-      <div class="ch-top">
-        <div>
-          <div class="ch-name">${l.name}</div>
-          <div class="ch-sub"><span class="pill ${st.color}">${st.label}</span> ${l.phone||''}</div>
-        </div>
-        <div class="case-btns">
-          ${l.status!=='closed'&&l.status!=='lost'?`<button class="btn-pri" onclick="convertLeadToCase(${l.id})">המר לתיק ←</button>`:''}
-          <button class="btn-del" onclick="deleteLead(${l.id})">🗑 מחק</button>
-        </div>
-      </div>
-    </div>
-    <div class="meta-row">
-      <div class="mi"><div class="ml">טלפון</div><div class="mv">${l.phone||'—'}</div></div>
-      <div class="mi"><div class="ml">שירות מבוקש</div><div class="mv gold">${l.service||'—'}</div></div>
-      <div class="mi"><div class="ml">מקור</div><div class="mv">${l.source||'—'}</div></div>
-      <div class="mi"><div class="ml">תאריך פנייה</div><div class="mv">${l.created}</div></div>
-    </div>
-    <div style="padding:16px 20px">
-      <div class="sec-title">סטטוס</div>
-      <div class="ss" style="flex-wrap:wrap;gap:6px;margin-bottom:18px">${statusBtns}</div>
-      <div class="sec-title">הערות</div>
-      <div class="notes-area"><textarea placeholder="הוסף הערות על הליד..." onchange="updateLeadField(${l.id},'notes',this.value)">${l.notes||''}</textarea></div>
-      ${l.timeline&&l.timeline.length?`
-      <div class="sec-title" style="margin-top:16px">היסטוריה</div>
-      <div>${l.timeline.map(t=>`<div class="tl-item"><div class="tl-dot ${t.c}"></div><div><div class="tl-title">${t.t}</div><div class="tl-date">${t.d}</div></div></div>`).join('')}</div>`:''}
-    </div>`;
-}
-
-function setLeadStatus(id,status){
-  const l=DB.leads.find(x=>x.id===id);
-  l.status=status;
-  if(!l.timeline)l.timeline=[];
-  l.timeline.push({t:'עדכון סטטוס: '+LEAD_STATUS[status].label,d:new Date().toLocaleDateString('he-IL'),c:LEAD_STATUS[status].color});
-  saveDB();renderLeads();renderLeadContent();
-}
-
-function updateLeadField(id,field,val){
-  DB.leads.find(x=>x.id===id)[field]=val;
-  saveDB();
-}
-
-function deleteLead(id){
-  const l=DB.leads.find(x=>x.id===id);
-  if(!confirm('למחוק את הליד "'+l.name+'"?'))return;
-  DB.leads=DB.leads.filter(x=>x.id!==id);
-  selectedLead=null;
-  document.getElementById('ca-leads').innerHTML='<div class="empty-state"><div class="empty-icon">🎯</div><div>בחר ליד או הוסף חדש</div></div>';
-  saveDB();renderLeads();renderDash();
-}
-
-function convertLeadToCase(id){
-  const l=DB.leads.find(x=>x.id===id);
-  if(!l)return;
-
-  // Build conversion modal
-  const modalHTML=`<div id="convertModal" style="
-    position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:99999;
-    display:flex;align-items:center;justify-content:center;font-family:'Heebo',sans-serif;direction:rtl">
-    <div style="background:#fff;border-radius:12px;padding:24px;width:400px;max-width:92vw;box-shadow:0 8px 32px rgba(0,0,0,0.2)">
-      <div style="font-size:16px;font-weight:700;color:#1A1A1A;margin-bottom:6px">המר ליד לתיק פעיל</div>
-      <div style="font-size:13px;color:#888;margin-bottom:20px">${l.name} — ${l.service||''}</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:20px">
-        ${[
-          {mod:'reg',    icon:'📋', label:'רישום מקרקעין'},
-          {mod:'tx',     icon:'🤝', label:'עסקת מכר/רכישה'},
-          {mod:'poa',    icon:'📄', label:'יפוי כוח מתמשך'},
-          {mod:'will',   icon:'📜', label:'צוואה'},
-          {mod:'lit',    icon:'⚖️', label:'ליטיגציה'},
-          {mod:'notary', icon:'🏛', label:'נוטריון'},
-          {mod:'other',  icon:'📁', label:'אחר'}
-        ].map(o=>`<button onclick="doConvertLead(${id},'${o.mod}')" style="
-          padding:12px 8px;border:2px solid #e0e0e0;border-radius:8px;background:#fff;
-          cursor:pointer;font-family:'Heebo',sans-serif;font-size:13px;font-weight:600;
-          color:#555;transition:all 0.2s;text-align:center"
-          onmouseover="this.style.borderColor='#B8860B';this.style.color='#B8860B';this.style.background='rgba(184,134,11,0.05)'"
-          onmouseout="this.style.borderColor='#e0e0e0';this.style.color='#555';this.style.background='#fff'">
-          <div style="font-size:22px;margin-bottom:4px">${o.icon}</div>
-          <div>${o.label}</div>
-        </button>`).join('')}
-      </div>
-      <button onclick="document.getElementById('convertModal').remove()" style="
-        width:100%;padding:10px;border:1px solid #e0e0e0;border-radius:8px;
-        background:#fff;cursor:pointer;font-family:'Heebo',sans-serif;font-size:13px;color:#888">
-        ביטול
-      </button>
-    </div>
-  </div>`;
-
-  document.body.insertAdjacentHTML('beforeend', modalHTML);
-}
-
-function doConvertLead(leadId, mod){
-  const l=DB.leads.find(x=>x.id===leadId);
-  if(!l)return;
-  document.getElementById('convertModal')?.remove();
-
-  // Create case directly with lead details — no form needed
-  const now=new Date().toLocaleDateString('he-IL');
-  const id=Date.now();
-  const modLabels={reg:'רישום',tx:'עסקה',poa:'יפוי כוח',will:'צוואה',lit:'ליטיגציה',notary:'נוטריון'};
-  let newCase=null;
-
-  if(mod==='reg'){
-    const regDocs=getRegDocs({subtype:'tabu'});
-    const docsObj={};regDocs.forEach(d=>docsObj[d.id]='missing');
-    newCase={id,name:l.name,phone:l.phone||'',address:'',gush:'',helka:'',fee:0,opposing:'',
-      subtype:'tabu',docs:docsObj,notes:'הומר מליד. '+( l.notes||''),stage:1,created:now,
-      timeline:[{t:'תיק נפתח מהמרת ליד',d:now,c:'gold'},{t:'ליד מקורי: '+(l.service||''),d:now,c:'teal'}]};
-    DB.reg.unshift(newCase);
-  }
-  else if(mod==='tx'){
-    newCase={id,type:'sell',name:l.name,phone:l.phone||'',address:'',gush:'',helka:'',
-      price:0,fee:0,opposing:'',deadline:'',stage:1,deadlines:[],
-      docs:{nasah:'missing',zchuyot:'missing',mashabah:'missing',masrehisha:'missing',iriya:'missing',mashneta:'missing',yipuy:'missing',heskem:'missing',tashlumim:'missing',tz:'missing'},
-      payments:[],notes:'הומר מליד. '+(l.notes||''),created:now,
-      timeline:[{t:'תיק נפתח מהמרת ליד',d:now,c:'gold'}]};
-    DB.tx.unshift(newCase);
-  }
-  else if(mod==='poa'){
-    newCase={id,name:l.name,phone:l.phone||'',idNum:'',address:'',
-      attorneys:[],scopes:{medical:false,financial:false,personal:false},
-      instructions:'',medicalNotes:'',fee:0,stage:1,status:'pending',
-      signDate:'',filingDate:'',filingRef:'',
-      notes:'הומר מליד. '+(l.notes||''),created:now,
-      timeline:[{t:'תיק נפתח מהמרת ליד',d:now,c:'gold'}]};
-    DB.poa.unshift(newCase);
-  }
-  else if(mod==='will'){
-    newCase={id,type:'edim',name:l.name,phone:l.phone||'',idNum:'',address:'',
-      heirs:[],assets:[],executor:'',witnesses:[],fee:0,stage:1,status:'draft',
-      signDate:'',filingDate:'',filingRef:'',
-      notes:'הומר מליד. '+(l.notes||''),created:now,
-      timeline:[{t:'תיק נפתח מהמרת ליד',d:now,c:'gold'}]};
-    DB.will.unshift(newCase);
-  }
-  else if(mod==='lit'){
-    newCase={id,type:'money',subtype:'',name:l.name,phone:l.phone||'',
-      subject:l.service||'',court:'',caseNum:'',opposingParty:'',opposingAtty:'',
-      claim:0,fee:0,verdict:'open',procedure:'',deadlines:[],
-      briefs:{kb_claim:'missing',kb_counter:'missing',kb_motion:'missing',kb_affidav:'missing',kb_expert:'missing',kb_summ:'missing'},
-      hearings:[],notes:'הומר מליד. '+(l.notes||''),created:now,
-      timeline:[{t:'תיק נפתח מהמרת ליד',d:now,c:'gold'}]};
-    DB.lit.unshift(newCase);
-  }
-  else if(mod==='notary'){
-    newCase={id,name:l.name,phone:l.phone||'',idNum:'',subtype:'other',
-      notes2:l.service||'',notes:'הומר מליד. '+(l.notes||''),
-      fee:0,stage:1,status:'בהכנה',authDate:'',created:now,
-      timeline:[{t:'תיק נפתח מהמרת ליד',d:now,c:'gold'}]};
-    DB.notary.unshift(newCase);
-  }
   else if(mod==='other'){
-    newCase={id,name:l.name,phone:l.phone||'',idNum:'',subtype:'other',
-      description:l.service||'',notes:'הומר מליד. '+(l.notes||''),
-      fee:0,stage:1,status:'פתוח',created:now,
-      timeline:[{t:'תיק נפתח מהמרת ליד',d:now,c:'gold'}]};
-    DB.other.unshift(newCase);
+    const newOther={id,name,phone:g('ff-phone'),idNum:g('ff-id'),fee:gn('ff-fee'),
+      subtype:g('ff-other-subtype')||'other',description:g('ff-description'),
+      notes:'',status:'פתוח',stage:1,created:now,
+      timeline:[{t:'פתיחת תיק',d:now,c:'gold'}]};
+    DB.other.unshift(newOther);
+    closeForm();switchModule('other');
+    setTimeout(()=>{render('other');selectCase('other',id);},50);
+    saveDB();renderDash();return;
+  }
+  else if(mod==='leads'){
+    const newLead={id,name,phone:g('ff-phone'),service:g('ff-service'),source:g('ff-source'),
+      notes:g('ff-notes'),status:'new',created:now,
+      timeline:[{t:'ליד נפתח',d:now,c:'blue'}]};
+    DB.leads.unshift(newLead);
+    closeForm();switchModule('leads');
+    setTimeout(()=>{renderLeads();selectLead(id);},50);
+    saveDB();renderDash();return;
   }
 
-  if(!newCase)return;
-
-  // Remove lead from DB
-  DB.leads=DB.leads.filter(x=>x.id!==leadId);
-
-  saveDB();renderDash();
-  switchModule(mod);
-  setTimeout(()=>{
-    render(mod);
-    selectCase(mod,id);
-    // Show success message
-    const msg=document.createElement('div');
-    msg.style.cssText='position:fixed;bottom:20px;left:20px;background:#2E8B57;color:#fff;padding:10px 18px;border-radius:8px;font-size:13px;font-weight:600;font-family:Heebo,sans-serif;z-index:9999';
-    msg.textContent='✓ תיק נפתח בהצלחה מהליד';
-    document.body.appendChild(msg);
-    setTimeout(()=>msg.remove(),3000);
-  },150);
+  DB[mod].unshift(newCase);
+  closeForm();switchModule(mod);
+  selectCase(mod,id);
+  renderDash();saveDB();
 }
-
-function setLeadFilter(f){
-  leadFilter=f;
-  ['all','new','contact','meeting','closed','lost'].forEach(t=>{
-    const el=document.getElementById('tf-leads-'+t);
-    if(el)el.className='fb'+(f===t?' act-all':'');
-  });
-  renderLeads();
-}
-
-// ============================================================
-// EDIT FORM
-// ============================================================
 function openEditForm(mod, id){
   const c = DB[mod].find(x => x.id === id);
   if(!c) return;
@@ -2245,6 +1918,240 @@ function saveEdit(mod, id){
   renderContent(mod);
   renderDash();
   saveDB();
+}
+
+
+// ============================================================
+// LEADS CONSTANTS & FUNCTIONS
+// ============================================================
+const LEAD_STAGES=['פנייה נכנסת','שיחה','פגישה','הצעת מחיר','סגירה'];
+const LEAD_SOURCES=['המלצה','אתר אינטרנט','גוגל','פייסבוק','לקוח חוזר','אחר'];
+const LEAD_SERVICES=['רישום מקרקעין','עסקת מכר','עסקת רכישה','יפוי כוח מתמשך','צוואה','ליטיגציה','נוטריון','אחר'];
+const LEAD_STATUS={
+  new:{label:'פנייה חדשה',color:'blue'},
+  contact:{label:'בשיחה',color:'amber'},
+  meeting:{label:'פגישה נקבעה',color:'purple'},
+  quote:{label:'הצעת מחיר',color:'teal'},
+  closed:{label:'נסגר ✓',color:'green'},
+  lost:{label:'נדחה',color:'red'}
+};
+
+let selectedLead=null, leadFilter='all';
+
+function renderLeads(){
+  const search=(document.getElementById('s-leads')?.value||'').toLowerCase();
+  const filtered=DB.leads.filter(l=>{
+    const ms=l.name.toLowerCase().includes(search)||(l.phone||'').includes(search);
+    const mt=leadFilter==='all'||l.status===leadFilter;
+    return ms&&mt;
+  });
+  document.getElementById('b-leads').textContent=DB.leads.length;
+  document.getElementById('list-leads').innerHTML=filtered.map(l=>{
+    const st=LEAD_STATUS[l.status]||LEAD_STATUS.new;
+    return`<div class="case-item${selectedLead===l.id?' active':''}" onclick="selectLead(${l.id})">
+      <div class="ci-top"><div class="ci-name">${l.name}</div><div class="ci-date">${l.created}</div></div>
+      <div class="ci-sub">${l.service||'—'} | ${l.source||'—'}</div>
+      <div class="ci-bottom">
+        <span class="pill ${st.color}">${st.label}</span>
+        <span style="font-size:11px;color:var(--text-dimmer)">${l.phone||''}</span>
+      </div>
+    </div>`;
+  }).join('')||'<div style="padding:18px;text-align:center;color:var(--text-dimmer);font-size:13px">אין לידים</div>';
+}
+
+function selectLead(id){
+  selectedLead=id;
+  renderLeads();
+  renderLeadContent();
+}
+
+function renderLeadContent(){
+  const l=DB.leads.find(x=>x.id===selectedLead);
+  if(!l)return;
+  const st=LEAD_STATUS[l.status]||LEAD_STATUS.new;
+  const ca=document.getElementById('ca-leads');
+  const statusBtns=Object.entries(LEAD_STATUS).map(([k,v])=>
+    `<button class="ss-btn${l.status===k?' act-'+v.color:''}"
+      style="${l.status===k?`border-color:var(--${v.color});color:var(--${v.color});background:var(--${v.color}-dim)`:''}"
+      onclick="setLeadStatus(${l.id},'${k}')">${v.label}</button>`
+  ).join('');
+  ca.innerHTML=`
+    <div class="case-header">
+      <div class="ch-top">
+        <div><div class="ch-name">${l.name}</div><div class="ch-sub"><span class="pill ${st.color}">${st.label}</span> ${l.phone||''}</div></div>
+        <div class="case-btns">
+          ${l.status!=='closed'&&l.status!=='lost'?`<button class="btn-pri" onclick="convertLeadToCase(${l.id})">המר לתיק ←</button>`:''}
+          <button class="btn-del" onclick="deleteLead(${l.id})">🗑 מחק</button>
+        </div>
+      </div>
+    </div>
+    <div class="meta-row">
+      <div class="mi"><div class="ml">טלפון</div><div class="mv">${l.phone||'—'}</div></div>
+      <div class="mi"><div class="ml">שירות מבוקש</div><div class="mv gold">${l.service||'—'}</div></div>
+      <div class="mi"><div class="ml">מקור</div><div class="mv">${l.source||'—'}</div></div>
+      <div class="mi"><div class="ml">תאריך פנייה</div><div class="mv">${l.created}</div></div>
+    </div>
+    <div style="padding:16px 20px">
+      <div class="sec-title">סטטוס</div>
+      <div class="ss" style="flex-wrap:wrap;gap:6px;margin-bottom:18px">${statusBtns}</div>
+      <div class="sec-title">הערות</div>
+      <div class="notes-area"><textarea placeholder="הוסף הערות על הליד..." onchange="updateLeadField(${l.id},'notes',this.value)">${l.notes||''}</textarea></div>
+      ${l.timeline&&l.timeline.length?`<div class="sec-title" style="margin-top:16px">היסטוריה</div>
+      <div>${l.timeline.map(t=>`<div class="tl-item"><div class="tl-dot ${t.c}"></div><div><div class="tl-title">${t.t}</div><div class="tl-date">${t.d}</div></div></div>`).join('')}</div>`:''}
+    </div>`;
+}
+
+function setLeadStatus(id,status){
+  const l=DB.leads.find(x=>x.id===id);
+  l.status=status;
+  l.timeline=l.timeline||[];
+  l.timeline.push({t:'עדכון סטטוס: '+LEAD_STATUS[status].label,d:new Date().toLocaleDateString('he-IL'),c:LEAD_STATUS[status].color});
+  saveDB();renderLeads();renderLeadContent();
+}
+
+function updateLeadField(id,field,val){DB.leads.find(x=>x.id===id)[field]=val;saveDB();}
+
+function deleteLead(id){
+  const l=DB.leads.find(x=>x.id===id);
+  if(!confirm('למחוק את הליד "'+l.name+'"?'))return;
+  DB.leads=DB.leads.filter(x=>x.id!==id);
+  selectedLead=null;
+  document.getElementById('ca-leads').innerHTML='<div class="empty-state"><div class="empty-icon">🎯</div><div>בחר ליד או הוסף חדש</div></div>';
+  saveDB();renderLeads();renderDash();
+}
+
+function setLeadFilter(f){
+  leadFilter=f;
+  ['all','new','contact','meeting','closed','lost'].forEach(t=>{
+    const el=document.getElementById('tf-leads-'+t);
+    if(el)el.className='fb'+(f===t?' act-all':'');
+  });
+  renderLeads();
+}
+
+function convertLeadToCase(id){
+  const l=DB.leads.find(x=>x.id===id);
+  if(!l)return;
+  const modalHTML=`<div id="convertModal" style="
+    position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:99999;
+    display:flex;align-items:center;justify-content:center;font-family:'Heebo',sans-serif;direction:rtl">
+    <div style="background:#fff;border-radius:12px;padding:24px;width:420px;max-width:92vw;box-shadow:0 8px 32px rgba(0,0,0,0.2)">
+      <div style="font-size:16px;font-weight:700;color:#1A1A1A;margin-bottom:6px">המר ליד לתיק פעיל</div>
+      <div style="font-size:13px;color:#888;margin-bottom:20px">${l.name} — ${l.service||''}</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px">
+        ${[{mod:'reg',icon:'📋',label:'רישום'},{mod:'tx',icon:'🤝',label:'עסקה'},
+           {mod:'poa',icon:'📄',label:'יפוי כוח'},{mod:'will',icon:'📜',label:'צוואה'},
+           {mod:'lit',icon:'⚖️',label:'ליטיגציה'},{mod:'notary',icon:'🏛',label:'נוטריון'},
+           {mod:'other',icon:'📁',label:'אחר'}].map(o=>`
+          <button onclick="doConvertLead(${id},'${o.mod}')" style="
+            padding:12px 8px;border:2px solid #e0e0e0;border-radius:8px;background:#fff;
+            cursor:pointer;font-family:'Heebo',sans-serif;font-size:13px;font-weight:600;color:#555;text-align:center"
+            onmouseover="this.style.borderColor='#B8860B';this.style.color='#B8860B'"
+            onmouseout="this.style.borderColor='#e0e0e0';this.style.color='#555'">
+            <div style="font-size:22px;margin-bottom:4px">${o.icon}</div>${o.label}
+          </button>`).join('')}
+      </div>
+      <button onclick="document.getElementById('convertModal').remove()" style="
+        width:100%;padding:10px;border:1px solid #e0e0e0;border-radius:8px;
+        background:#fff;cursor:pointer;font-family:'Heebo',sans-serif;font-size:13px;color:#888">ביטול</button>
+    </div>
+  </div>`;
+  document.body.insertAdjacentHTML('beforeend',modalHTML);
+}
+
+function doConvertLead(leadId,mod){
+  const l=DB.leads.find(x=>x.id===leadId);
+  if(!l)return;
+  document.getElementById('convertModal')?.remove();
+  const now=new Date().toLocaleDateString('he-IL');
+  const id=Date.now();
+  const modLabels={reg:'רישום',tx:'עסקה',poa:'יפוי כוח',will:'צוואה',lit:'ליטיגציה',notary:'נוטריון',other:'אחר'};
+  let newCase=null;
+  if(mod==='reg'){const regDocs=getRegDocs({subtype:'tabu'});const docsObj={};regDocs.forEach(d=>docsObj[d.id]='missing');newCase={id,name:l.name,phone:l.phone||'',address:'',gush:'',helka:'',fee:0,opposing:'',subtype:'tabu',docs:docsObj,notes:'הומר מליד. '+(l.notes||''),stage:1,created:now,timeline:[{t:'תיק נפתח מהמרת ליד',d:now,c:'gold'}]};DB.reg.unshift(newCase);}
+  else if(mod==='tx'){newCase={id,type:'sell',name:l.name,phone:l.phone||'',address:'',gush:'',helka:'',price:0,fee:0,opposing:'',deadline:'',stage:1,deadlines:[],docs:{nasah:'missing',zchuyot:'missing',mashabah:'missing',masrehisha:'missing',iriya:'missing',mashneta:'missing',yipuy:'missing',heskem:'missing',tashlumim:'missing',tz:'missing'},payments:[],notes:'הומר מליד. '+(l.notes||''),created:now,timeline:[{t:'תיק נפתח מהמרת ליד',d:now,c:'gold'}]};DB.tx.unshift(newCase);}
+  else if(mod==='poa'){newCase={id,name:l.name,phone:l.phone||'',idNum:'',address:'',attorneys:[],scopes:{medical:false,financial:false,personal:false},instructions:'',medicalNotes:'',fee:0,stage:1,status:'pending',signDate:'',filingDate:'',filingRef:'',notes:'הומר מליד. '+(l.notes||''),created:now,timeline:[{t:'תיק נפתח מהמרת ליד',d:now,c:'gold'}]};DB.poa.unshift(newCase);}
+  else if(mod==='will'){newCase={id,type:'edim',name:l.name,phone:l.phone||'',idNum:'',address:'',heirs:[],assets:[],executor:'',witnesses:[],fee:0,stage:1,status:'draft',signDate:'',filingDate:'',filingRef:'',notes:'הומר מליד. '+(l.notes||''),created:now,timeline:[{t:'תיק נפתח מהמרת ליד',d:now,c:'gold'}]};DB.will.unshift(newCase);}
+  else if(mod==='lit'){newCase={id,type:'money',subtype:'',name:l.name,phone:l.phone||'',subject:l.service||'',court:'',caseNum:'',opposingParty:'',opposingAtty:'',claim:0,fee:0,verdict:'open',procedure:'',deadlines:[],briefs:{kb_claim:'missing',kb_counter:'missing',kb_motion:'missing',kb_affidav:'missing',kb_expert:'missing',kb_summ:'missing'},hearings:[],notes:'הומר מליד. '+(l.notes||''),created:now,timeline:[{t:'תיק נפתח מהמרת ליד',d:now,c:'gold'}]};DB.lit.unshift(newCase);}
+  else if(mod==='notary'){newCase={id,name:l.name,phone:l.phone||'',idNum:'',subtype:'other',notes2:l.service||'',notes:'הומר מליד. '+(l.notes||''),fee:0,stage:1,status:'בהכנה',authDate:'',created:now,timeline:[{t:'תיק נפתח מהמרת ליד',d:now,c:'gold'}]};DB.notary.unshift(newCase);}
+  else if(mod==='other'){newCase={id,name:l.name,phone:l.phone||'',idNum:'',subtype:'other',description:l.service||'',notes:'הומר מליד. '+(l.notes||''),fee:0,stage:1,status:'פתוח',created:now,timeline:[{t:'תיק נפתח מהמרת ליד',d:now,c:'gold'}]};DB.other.unshift(newCase);}
+  if(!newCase)return;
+  DB.leads=DB.leads.filter(x=>x.id!==leadId);
+  saveDB();renderDash();
+  switchModule(mod);
+  setTimeout(()=>{render(mod);selectCase(mod,id);
+    const msg=document.createElement('div');
+    msg.style.cssText='position:fixed;bottom:20px;left:20px;background:#2E8B57;color:#fff;padding:10px 18px;border-radius:8px;font-size:13px;font-weight:600;font-family:Heebo,sans-serif;z-index:9999';
+    msg.textContent='✓ תיק נפתח בהצלחה';document.body.appendChild(msg);setTimeout(()=>msg.remove(),3000);
+  },150);
+}
+
+// ============================================================
+// DELETE CASE
+// ============================================================
+function deleteCase(mod,id){
+  const c=DB[mod]?.find(x=>x.id===id);
+  if(!c)return;
+  if(!confirm('למחוק את תיק "'+c.name+'"?\nפעולה זו לא ניתנת לביטול.'))return;
+  DB[mod]=DB[mod].filter(x=>x.id!==id);
+  const sel=document.getElementById('ca-'+mod);
+  if(sel)sel.innerHTML='<div class="empty-state"><div class="empty-icon">'+
+    {reg:'📋',tx:'🤝',poa:'📄',will:'📜',lit:'⚖️',notary:'🏛',other:'📁',leads:'🎯'}[mod]+
+    '</div><div>בחר תיק מהרשימה או פתח חדש</div></div>';
+  if(mod==='leads'){selectedLead=null;renderLeads();}
+  else{selected[mod]=null;render(mod);}
+  saveDB();renderDash();
+}
+
+// ============================================================
+// DEADLINES
+// ============================================================
+function addDeadline(mod,id){
+  const c=DB[mod].find(x=>x.id===id);
+  if(!c.deadlines)c.deadlines=[];
+  const type=document.getElementById('dl-type-'+mod+'-'+id)?.value;
+  const date=document.getElementById('dl-date-'+mod+'-'+id)?.value;
+  const note=document.getElementById('dl-note-'+mod+'-'+id)?.value||'';
+  if(!date){alert('נא לבחור תאריך');return;}
+  c.deadlines.push({type,date,note});
+  c.timeline=c.timeline||[];
+  c.timeline.push({t:'מועד נוסף: '+type,d:new Date().toLocaleDateString('he-IL'),c:'amber'});
+  saveDB();renderContent(mod);
+}
+
+function removeDeadline(mod,id,idx){
+  const c=DB[mod].find(x=>x.id===id);
+  if(!c.deadlines)return;
+  if(!confirm('למחוק מועד זה?'))return;
+  c.deadlines.splice(idx,1);
+  saveDB();renderContent(mod);
+}
+
+function setLitProcedure(id,proc){
+  const c=DB.lit.find(x=>x.id===id);
+  if(!c)return;
+  c.procedure=proc;
+  c.timeline=c.timeline||[];
+  c.timeline.push({t:'מסגרת דיונית: '+LIT_PROCEDURES[proc].label,d:new Date().toLocaleDateString('he-IL'),c:'blue'});
+  saveDB();renderContent('lit');
+}
+
+function autoAddDeadlines(id){
+  const c=DB.lit.find(x=>x.id===id);
+  if(!c||!c.procedure)return;
+  const proc=LIT_PROCEDURES[c.procedure];
+  if(!proc)return;
+  const startDate=prompt('תאריך הגשת כתב התביעה (YYYY-MM-DD):');
+  if(!startDate)return;
+  if(!c.deadlines)c.deadlines=[];
+  const base=new Date(startDate);
+  proc.deadlines.forEach(d=>{
+    const dDate=new Date(base);
+    dDate.setDate(dDate.getDate()+d.days);
+    c.deadlines.push({type:d.event,date:dDate.toISOString().split('T')[0],note:d.from+' + '+d.days+' ימים'});
+  });
+  c.timeline=c.timeline||[];
+  c.timeline.push({t:'מועדים נוספו אוטומטית — '+proc.label,d:new Date().toLocaleDateString('he-IL'),c:'amber'});
+  saveDB();renderContent('lit');
 }
 
 // ============================================================
