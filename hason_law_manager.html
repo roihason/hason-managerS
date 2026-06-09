@@ -19,6 +19,7 @@
   --blue:#2255AA;--blue-dim:rgba(34,85,170,0.06);
   --amber:#CC7700;--amber-dim:rgba(204,119,0,0.06);
   --purple:#6644AA;--purple-dim:rgba(102,68,170,0.08);
+  --gray:#777777;--gray-dim:rgba(119,119,119,0.08);
 }
 
 body{font-family:'Heebo',sans-serif;background:var(--bg-main);color:var(--text);height:100vh;direction:rtl;font-size:14px;overflow:hidden}
@@ -28,7 +29,7 @@ body{font-family:'Heebo',sans-serif;background:var(--bg-main);color:var(--text);
 .nav-brand{font-size:16px;font-weight:700;color:var(--gold);margin-left:36px;white-space:nowrap;letter-spacing:0.5px}
 .nav-tabs{display:flex;gap:4px;flex:1;overflow-x:auto;height:100%;align-items:center}
 .nav-tabs::-webkit-scrollbar{height:0}
-.nav-tab{padding:0 16px;height:40px;border-radius:6px;display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text-dim);cursor:pointer;transition:all 0.2s;white-space:nowrap;font-weight:400}
+.nav-tab{padding:0 14px;height:40px;border-radius:6px;display:flex;align-items:center;gap:6px;font-size:13px;color:var(--text-dim);cursor:pointer;transition:all 0.2s;white-space:nowrap;font-weight:400}
 .nav-tab:hover{color:var(--text);background:var(--bg-main)}
 .nav-tab.active{color:var(--gold);background:var(--gold-dim);font-weight:600}
 .tab-badge{background:rgba(0,0,0,0.05);color:var(--text-dim);border-radius:12px;padding:1px 6px;font-size:11px;font-weight:600}
@@ -39,14 +40,14 @@ body{font-family:'Heebo',sans-serif;background:var(--bg-main);color:var(--text);
 .module{display:none;width:100%;height:100%;overflow:hidden}
 .module.active{display:flex}
 
-/* DASHBOARD - FIXED HIERARCHY (TABLES ON TOP) */
+/* DASHBOARD */
 .dashboard{flex:1;overflow-y:auto;padding:32px;background:var(--bg-main);display:flex;flex-direction:column;gap:24px}
 .dash-welcome{margin-bottom:4px}
 .dash-title{font-size:24px;font-weight:700;color:var(--dark)}
 .dash-sub{font-size:13px;color:var(--text-dim);margin-top:4px}
 
-.dash-sections{display:grid;grid-template-columns:1fr 1fr;gap:20px;order:1} /* Tables are now first in order */
-.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;order:2} /* Stats moved below tables */
+.dash-sections{display:grid;grid-template-columns:1fr 1fr;gap:20px;order:1}
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;order:2;margin-top:8px}
 
 .dash-section{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;overflow:hidden;box-shadow:0 2px 4px rgba(0,0,0,0.01)}
 .ds-header{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;background:#FFF}
@@ -56,19 +57,24 @@ body{font-family:'Heebo',sans-serif;background:var(--bg-main);color:var(--text);
 .ds-item:last-child{border-bottom:none}
 .ds-item:hover{background:var(--bg-main)}
 .dsi-name{font-size:13px;font-weight:500;color:var(--text)}
+.dsi-sub覆{font-size:11px;color:var(--text-light);margin-top:2px}
 .dsi-sub{font-size:11px;color:var(--text-light);margin-top:2px}
 .dsi-badge{font-size:10px;font-weight:600;padding:2px 8px;border-radius:12px}
 
-.stat-card{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:20px;cursor:pointer;transition:all 0.2s;box-shadow:0 2px 4px rgba(0,0,0,0.01);position:relative;overflow:hidden}
+.stat-card{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:16px 20px;cursor:pointer;transition:all 0.2s;box-shadow:0 2px 4px rgba(0,0,0,0.01);position:relative;overflow:hidden}
 .stat-card:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,0.04);border-color:rgba(184,134,11,0.2)}
 .stat-card::before{content:'';position:absolute;top:0;right:0;width:4px;height:100%}
 .stat-card.reg::before{background:var(--gold)}
 .stat-card.tx::before{background:var(--amber)}
 .stat-card.poa::before{background:var(--blue)}
 .stat-card.will::before{background:var(--purple)}
-.stat-icon{font-size:28px;margin-bottom:12px}
+.stat-card.lit::before{background:var(--red)}
+.stat-card.notary::before{background:var(--green)}
+.stat-card.leads::before{background:#2255AA}
+.stat-card.other::before{background:var(--gray)}
+.stat-icon{font-size:24px;margin-bottom:8px}
 .stat-label{font-size:12px;color:var(--text-light);font-weight:600;margin-bottom:4px}
-.stat-num{font-size:28px;font-weight:700;color:var(--dark)}
+.stat-num{font-size:24px;font-weight:700;color:var(--dark)}
 
 /* SIDEBAR */
 .sidebar{width:300px;min-width:300px;background:#FFFFFF;border-left:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;flex-shrink:0}
@@ -127,12 +133,6 @@ body{font-family:'Heebo',sans-serif;background:var(--bg-main);color:var(--text);
 .ml{font-size:11px;color:var(--text-light);font-weight:600;margin-bottom:4px}
 .mv{font-size:13px;font-weight:600;color:var(--text)}
 
-.timeline-box{position:relative;padding-right:20px;border-right:2px solid var(--border);margin-right:8px}
-.tl-node{position:relative;padding-bottom:16px}
-.tl-node::before{content:'';position:absolute;right:-25px;top:4px;width:8px;height:8px;border-radius:50%;background:var(--gold);border:2px solid #FFF;box-shadow:0 0 0 2px var(--gold-dim)}
-.tl-time{font-size:11px;color:var(--text-light)}
-.tl-text{font-size:13px;font-weight:500;color:var(--text);margin-top:2px}
-
 /* MODERN FORM OVERLAY */
 .form-overlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;width:100%;height:100%;background:rgba(0,0,0,0.4);backdrop-filter:blur(4px);z-index:9999;align-items:center;justify-content:center}
 .form-overlay.open{display:flex}
@@ -181,13 +181,14 @@ body{font-family:'Heebo',sans-serif;background:var(--bg-main);color:var(--text);
   <div class="nav-brand">⚖ חסון עורכי דין</div>
   <div class="nav-tabs">
     <div class="nav-tab active" id="tab-dash" onclick="switchModule('dash')">🏠 לוח בקרה</div>
-    <div class="nav-tab" id="tab-reg" onclick="switchModule('reg')">📋 רישומים ומקרקעין <span class="tab-badge" id="b-reg">0</span></div>
-    <div class="nav-tab" id="tab-tx" onclick="switchModule('tx')">🤝 עסקאות מכר/רכישה <span class="tab-badge" id="b-tx">0</span></div>
+    <div class="nav-tab" id="tab-reg" onclick="switchModule('reg')">📋 רישומים ومקרקעין <span class="tab-badge" id="b-reg">0</span></div>
+    <div class="nav-tab" id="tab-tx" onclick="switchModule('tx')">🤝 עסקאות נדל"ן <span class="tab-badge" id="b-tx">0</span></div>
     <div class="nav-tab" id="tab-poa" onclick="switchModule('poa')">📄 יפויי כוח מתמשך <span class="tab-badge" id="b-poa">0</span></div>
     <div class="nav-tab" id="tab-will" onclick="switchModule('will')">📜 צוואות וירושות <span class="tab-badge" id="b-will">0</span></div>
     <div class="nav-tab" id="tab-lit" onclick="switchModule('lit')">🏛 ליטיגציה ובימ"ש <span class="tab-badge" id="b-lit">0</span></div>
     <div class="nav-tab" id="tab-notary" onclick="switchModule('notary')">✒️ אימות נוטריוני <span class="tab-badge" id="b-notary">0</span></div>
     <div class="nav-tab" id="tab-leads" onclick="switchModule('leads')">🎯 לידים ופניות <span class="tab-badge" id="b-leads">0</span></div>
+    <div class="nav-tab" id="tab-other" onclick="switchModule('other')">📁 אחר / כללי <span class="tab-badge" id="b-other">0</span></div>
   </div>
 </div>
 
@@ -207,4 +208,440 @@ body{font-family:'Heebo',sans-serif;background:var(--bg-main);color:var(--text);
         </div>
         <div class="dash-section">
           <div class="ds-header"><div class="ds-title">🎯 פניות ולידים חדשים לטיפול</div></div>
-          <div class="
+          <div class="ds-body" id="dash-leads-list"></div>
+        </div>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-card reg" onclick="switchModule('reg')"><div class="stat-icon">📋</div><div class="stat-label">נדל"ן ורישומים</div><div class="stat-num" id="ds-reg">0</div></div>
+        <div class="stat-card tx" onclick="switchModule('tx')"><div class="stat-icon">🤝</div><div class="stat-label">עסקאות נדל"ן</div><div class="stat-num" id="ds-tx">0</div></div>
+        <div class="stat-card poa" onclick="switchModule('poa')"><div class="stat-icon">📄</div><div class="stat-label">יפויי כוח מתמשך</div><div class="stat-num" id="ds-poa">0</div></div>
+        <div class="stat-card will" onclick="switchModule('will')"><div class="stat-icon">📜</div><div class="stat-label">צוואות וירושה</div><div class="stat-num" id="ds-will">0</div></div>
+        <div class="stat-card lit" onclick="switchModule('lit')"><div class="stat-icon">🏛</div><div class="stat-label">ליטיגציה ובימ"ש</div><div class="stat-num" id="ds-lit">0</div></div>
+        <div class="stat-card notary" onclick="switchModule('notary')"><div class="stat-icon">✒️</div><div class="stat-label">אימות נוטריוני</div><div class="stat-num" id="ds-notary">0</div></div>
+        <div class="stat-card leads" onclick="switchModule('leads')"><div class="stat-icon">🎯</div><div class="stat-label">לידים ופניות</div><div class="stat-num" id="ds-leads">0</div></div>
+        <div class="stat-card other" onclick="switchModule('other')"><div class="stat-icon">📁</div><div class="stat-label">אחר / כללי</div><div class="stat-num" id="ds-other">0</div></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const modulesList = ['reg', 'tx', 'poa', 'will', 'lit', 'notary', 'leads', 'other'];
+    const moduleNames = {
+      reg: 'תיקי רישום ומקרקעין', tx: 'עסקאות (מכר/רכישה/שכירות)', poa: 'תיקי יפוי כוח מתמשך',
+      will: 'צוואות ועזבונות', lit: 'תיקי ליטיגציה', notary: 'אישורים נוטריונים', 
+      leads: 'פניות חדשות', other: 'תיקים כלליים ואחר'
+    };
+    
+    modulesList.forEach(m => {
+      document.write(`
+        <div class="module" id="mod-${m}">
+          <div class="sidebar">
+            <div class="sb-header">
+              <div class="sb-title">${moduleNames[m]}</div>
+              <div class="search-box">🔍<input placeholder="חיפוש מהיר ברשימה..." id="s-${m}" oninput="renderModule('${m}')"/></div>
+              <button class="add-btn-top" onclick="openForm('${m}')">➕ הוסף רשומה חדשה</button>
+            </div>
+            <div class="cases-list" id="list-${m}"></div>
+          </div>
+          <div class="content-area" id="ca-${m}">
+            <div class="empty-state"><div class="empty-icon">⚖️</div><div>בחר תיק מהרשימה הצידית או פתח רשומה חדשה לעבודה</div></div>
+          </div>
+        </div>
+      `);
+    });
+  </script>
+
+</div>
+
+<script>
+const PASS = 'hason2025!';
+const SESSION_KEY = 'hason_auth_v1';
+
+function checkPassword(){
+  const input = document.getElementById('passwordInput').value;
+  if(input === PASS){
+    sessionStorage.setItem(SESSION_KEY, '1');
+    document.getElementById('loginScreen').style.display = 'none';
+  } else {
+    document.getElementById('loginError').textContent = '❌ סיסמת גישה שגויה. נסה שנית.';
+    document.getElementById('passwordInput').value = '';
+    setTimeout(()=>document.getElementById('loginError').textContent='', 3000);
+  }
+}
+
+if(sessionStorage.getItem(SESSION_KEY) === '1'){
+  document.addEventListener('DOMContentLoaded', ()=>{
+    document.getElementById('loginScreen').style.display = 'none';
+  });
+}
+
+let store = JSON.parse(localStorage.getItem('hason_crm_store_v2')) || {};
+modulesList.forEach(m => { if(!store[m]) store[m] = []; });
+
+function saveStore() {
+  localStorage.setItem('hason_crm_store_v2', JSON.stringify(store));
+  updateBadges();
+  renderDashboard();
+}
+
+function switchModule(modId) {
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.module').forEach(m => m.classList.remove('active'));
+  
+  const activeTab = document.getElementById(`tab-${modId}`);
+  if(activeTab) activeTab.classList.add('active');
+  
+  const activeModule = document.getElementById(`mod-${modId}`);
+  if(activeModule) activeModule.classList.add('active');
+
+  if(modId !== 'dash') {
+    renderModule(modId);
+  } else {
+    renderDashboard();
+  }
+}
+
+function updateBadges() {
+  modulesList.forEach(m => {
+    const badge = document.getElementById(`b-${m}`);
+    if(badge) badge.textContent = store[m] ? store[m].length : 0;
+  });
+}
+
+function renderModule(mod) {
+  const container = document.getElementById(`list-${mod}`);
+  if(!container) return;
+  
+  const searchVal = document.getElementById(`s-${mod}`).value.toLowerCase();
+  container.innerHTML = '';
+  
+  const filtered = (store[mod] || []).filter(item => 
+    item.name.toLowerCase().includes(searchVal) || 
+    item.client.toLowerCase().includes(searchVal)
+  );
+  
+  if(filtered.length === 0) {
+    container.innerHTML = '<div style="padding:24px; text-align:center; color:var(--text-light)">אין תוצאות תואמות</div>';
+    return;
+  }
+  
+  filtered.forEach(item => {
+    const div = document.createElement('div');
+    div.className = 'case-item';
+    div.onclick = () => showItemDetails(mod, item.id);
+    div.innerHTML = `
+      <div class="ci-top">
+        <span class="ci-name">${item.name}</span>
+        <span class="ci-date">${item.date}</span>
+      </div>
+      <div class="ci-sub">${item.client}</div>
+    `;
+    container.appendChild(div);
+  });
+}
+
+function showItemDetails(mod, id) {
+  const item = store[mod].find(i => i.id === id);
+  const workspace = document.getElementById(`ca-${mod}`);
+  if(!item || !workspace) return;
+  
+  let dynamicInputsHTML = '';
+  
+  if(mod === 'tx') {
+    if(item.extraType === 'rent') {
+      dynamicInputsHTML = `
+        <div class="meta-grid">
+          <div class="mi-card"><div class="ml">סוג העסקה</div><div class="mv" style="color:var(--amber)">שכירות מגורים/מסחרי</div></div>
+          <div class="mi-card"><div class="ml">דמי שכירות חודשיים</div><div class="mv">${item.extra1 || 'לא נקבע'}</div></div>
+          <div class="mi-card"><div class="ml">תקופת החוזה + אופציה</div><div class="mv">${item.extra2 || 'לא הוגדר'}</div></div>
+          <div class="mi-card"><div class="ml">בטוחות וערבויות</div><div class="mv">${item.extra3 || 'טרם התקבלו'}</div></div>
+        </div>
+      `;
+    } else {
+      dynamicInputsHTML = `
+        <div class="meta-grid">
+          <div class="mi-card"><div class="ml">סוג העסקה</div><div class="mv" style="color:var(--gold)">מכר / רכישה</div></div>
+          <div class="mi-card"><div class="ml">סוג הנכס</div><div class="mv">${item.extra1 || 'דירה/מגרש'}</div></div>
+          <div class="mi-card"><div class="ml">שווי נכס בחוזה</div><div class="mv">${item.extra2 || 'לא הוזן'}</div></div>
+          <div class="mi-card"><div class="ml">סיכום שכ"ט מוסכם</div><div class="mv">${item.extra3 || 'בטיפול'}</div></div>
+        </div>
+      `;
+    }
+  } else if (mod === 'lit') {
+    dynamicInputsHTML = `
+      <div class="meta-grid">
+        <div class="mi-card"><div class="ml">מספר תיק בימ"ש</div><div class="mv">${item.extra1 || 'טרם נקבע'}</div></div>
+        <div class="mi-card"><div class="ml">ערכאה משפטית</div><div class="mv">${item.extra2 || 'לא נקבע'}</div></div>
+        <div class="mi-card"><div class="ml">מועד דיון קרוב</div><div class="mv" style="color:var(--red); font-weight:bold">${item.extra3 || 'אין דיון קרוב'}</div></div>
+      </div>
+    `;
+  } else if (mod === 'notary') {
+    dynamicInputsHTML = `
+      <div class="meta-grid">
+        <div class="mi-card"><div class="ml">סוג אישור נוטריוני</div><div class="mv">${item.extra1 || 'אימות חתימה'}</div></div>
+        <div class="mi-card"><div class="ml">מספר עותקים ומחירון</div><div class="mv">${item.extra2 || '1'}</div></div>
+        <div class="mi-card"><div class="ml">סטטוס גבייה</div><div class="mv">${item.extra3 || 'שולם'}</div></div>
+      </div>
+    `;
+  } else {
+    dynamicInputsHTML = `
+      <div class="meta-grid">
+        <div class="mi-card"><div class="ml">מידע כללי ופרטי רקע</div><div class="mv">${item.details || 'אין פירוט נוסף'}</div></div>
+        <div class="mi-card"><div class="ml">מטפל בתיק</div><div class="mv">עו"ד רועי חסון</div></div>
+        <div class="mi-card"><div class="ml">סטטוס עבודה</div><div class="mv" style="color:var(--green)">פעיל בטיפול</div></div>
+      </div>
+    `;
+  }
+
+  let convertOptions = '';
+  modulesList.forEach(m => {
+    if(m !== mod) {
+      convertOptions += `<option value="${m}">${moduleNames[m]}</option>`;
+    }
+  });
+
+  workspace.innerHTML = `
+    <div class="case-header">
+      <div class="ch-top">
+        <div>
+          <div class="ch-name">${item.name}</div>
+          <div class="ch-sub">לקוח: <strong>${item.client}</strong> | תאריך פתיחה: ${item.date}</div>
+        </div>
+        <div class="case-btns">
+          <div class="convert-box">
+            <span class="convert-label">🔀 המר תיק זה אל:</span>
+            <select id="convertTargetSelect" class="convert-select">${convertOptions}</select>
+            <button class="btn-convert-go" onclick="executeConvert('${mod}', '${id}')">בצע המרה</button>
+          </div>
+          <button class="btn-del" onclick="deleteItem('${mod}', '${id}')">🗑 מחק תיק</button>
+        </div>
+      </div>
+    </div>
+    
+    <div class="sec">
+      <div class="sec-title">📌 נתוני מפתח ומאפייני התיק</div>
+      ${dynamicInputsHTML}
+    </div>
+
+    <div class="sec">
+      <div class="sec-title">📝 הערות עבודה, משימות ומעקב שוטף</div>
+      <textarea style="width:100%; min-height:140px; padding:16px; border:1px solid var(--border); border-radius:10px; font-family:inherit; font-size:13px; line-height:1.6; outline:none; background:var(--bg-main)" 
+        placeholder="רשום עדכונים שוטפים..." 
+        onblur="saveNotes('${mod}', '${id}', this.value)">${item.notes || ''}</textarea>
+    </div>
+  `;
+}
+
+function executeConvert(currentMod, id) {
+  const targetMod = document.getElementById('convertTargetSelect').value;
+  if(!targetMod) return;
+
+  const itemIdx = store[currentMod].findIndex(i => i.id === id);
+  if(itemIdx === -1) return;
+
+  const item = store[currentMod].splice(itemIdx, 1)[0];
+  item.notes = (item.notes || '') + `\n[הומר אוטומטית ממודול ${moduleNames[currentMod]} בתאריך ${new Date().toLocaleDateString('he-IL')}]`;
+  
+  store[targetMod].unshift(item);
+  saveStore();
+  
+  alert(`התיק הועבר בהצלחה אל: ${moduleNames[targetMod]}`);
+  renderModule(currentMod);
+  document.getElementById(`ca-${currentMod}`).innerHTML = `<div class="empty-state"><div class="empty-icon">🚀</div><div>התיק הומר והועבר בהצלחה ליעד החדש</div></div>`;
+}
+
+function saveNotes(mod, id, val) {
+  const item = store[mod].find(i => i.id === id);
+  if(item) {
+    item.notes = val;
+    localStorage.setItem('hason_crm_store_v2', JSON.stringify(store));
+  }
+}
+
+function deleteItem(mod, id) {
+  if(confirm('האם אתה בטוח שברצונך למחוק רשומה זו?')) {
+    store[mod] = store[mod].filter(i => i.id !== id);
+    saveStore();
+    renderModule(mod);
+    document.getElementById(`ca-${mod}`).innerHTML = `<div class="empty-state"><div class="empty-icon">⚖️</div><div>הרשומה נמחקה מהמאגר</div></div>`;
+  }
+}
+
+function openForm(mod) {
+  const overlay = document.getElementById('formOverlay');
+  const card = document.getElementById('formCard');
+  
+  let dynamicInputsFields = '';
+  
+  if(mod === 'tx') {
+    dynamicInputsFields = `
+      <div class="fg">
+        <label class="fl">סוג עסקת הנדל"ן</label>
+        <select id="f-extraType" class="fi" onchange="toggleFormTransactionFields(this.value)">
+          <option value="sale">מכר / רכישה</option>
+          <option value="rent">שכירות (מגורים / מסחרי)</option>
+        </select>
+      </div>
+      <div id="tx-dynamic-container">
+        <div class="fg"><label class="fl">סוג הנכס</label><input type="text" id="f-extra1" class="fi" placeholder="לדוגמה: דירת 4 חדרים, חנות, מגרש"></div>
+        <div class="fg"><label class="fl">שווי הנכס בחוזה</label><input type="text" id="f-extra2" class="fi" placeholder="לדוגמה: 2,450,000 שח"></div>
+        <div class="fg"><label class="fl">סיכום שכ"ט מוסכם</label><input type="text" id="f-extra3" class="fi" placeholder="לדוגמה: 0.5% + מעמ"></div>
+      </div>
+    `;
+  } else if (mod === 'lit') {
+    dynamicInputsFields = `
+      <div class="fg"><label class="fl">מספר תיק בית משפט</label><input type="text" id="f-extra1" class="fi" placeholder="לדוגמה: תאק 14254-02-26"></div>
+      <div class="fg"><label class="fl">בית משפט וערכאה</label><input type="text" id="f-extra2" class="fi" placeholder="לדוגמה: השלום נתניה"></div>
+      <div class="fg"><label class="fl">מועד דיון קרוב</label><input type="text" id="f-extra3" class="fi" placeholder="לדוגמה: 14/09/2026"></div>
+    `;
+  } else if (mod === 'notary') {
+    dynamicInputsFields = `
+      <div class="fg"><label class="fl">סוג האישור (אימות חתימה, העתק מתאים למקור, תרגום)</label><input type="text" id="f-extra1" class="fi" placeholder="לדוגמה: אימות חתימה על יפוי כוח"></div>
+      <div class="fg"><label class="fl">מספר עותקים נדרש</label><input type="text" id="f-extra2" class="fi" placeholder="לדוגמה: 2 עותקים"></div>
+      <div class="fg"><label class="fl">סטטוס תשלום אגרה/שכר</label><input type="text" id="f-extra3" class="fi" placeholder="שולם/בטיפול"></div>
+    `;
+  } else {
+    dynamicInputsFields = `
+      <div class="fg"><label class="fl">פרטים מזהים ומידע כללי חיוני (גוש, חלקה, דרכון וכו')</label><input type="text" id="f-details" class="fi" placeholder="הזן פרטים מזהים או הערות לפתיחה"></div>
+    `;
+  }
+
+  card.innerHTML = `
+    <div class="form-title">
+      <span>➕ יצירת רשומה חדשה - ${moduleNames[mod]}</span>
+      <span class="form-close" onclick="closeForm()">×</span>
+    </div>
+    <div class="fg">
+      <label class="fl">שם התיק / תיאור קצר</label>
+      <input type="text" id="f-name" class="fi" placeholder="הזן שם מזהה לתיק">
+    </div>
+    <div class="fg">
+      <label class="fl">שם הלקוח / הפונה (כולל טלפון נייד)</label>
+      <input type="text" id="f-client" class="fi" placeholder="שם מלא וטלפון">
+    </div>
+    ${dynamicInputsFields}
+    <div class="form-actions">
+      <button class="btn-pri" onclick="submitForm('${mod}')">שמור רשומה ומפתח תיק</button>
+    </div>
+  `;
+  overlay.classList.add('open');
+}
+
+function toggleFormTransactionFields(val) {
+  const container = document.getElementById('tx-dynamic-container');
+  if(!container) return;
+  
+  if(val === 'rent') {
+    container.innerHTML = `
+      <div class="fg"><label class="fl">דמי שכירות חודשיים (בשקלים)</label><input type="text" id="f-extra1" class="fi" placeholder="לדוגמה: 5,500 שח בחודש"></div>
+      <div class="fg"><label class="fl">תקופת השכירות (כולל אופציות)</label><input type="text" id="f-extra2" class="fi" placeholder="לדוגמה: 12 חודשים + אופציה לשנה נוספת"></div>
+      <div class="fg"><label class="fl">בטוחות וערבויות נדרשות</label><input type="text" id="f-extra3" class="fi" placeholder="לדוגמה: ערבות בנקאית 20 אלף + שני ערבים"></div>
+    `;
+  } else {
+    container.innerHTML = `
+      <div class="fg"><label class="fl">סוג הנכס</label><input type="text" id="f-extra1" class="fi" placeholder="לדוגמה: דירת 4 חדרים, חנות, מגרש"></div>
+      <div class="fg"><label class="fl">שווי הנכס בחוזה</label><input type="text" id="f-extra2" class="fi" placeholder="לדוגמה: 2,450,000 שח"></div>
+      <div class="fg"><label class="fl">סיכום שכ"ט מוסכם</label><input type="text" id="f-extra3" class="fi" placeholder="לדוגמה: 0.5% + מעמ"></div>
+    `;
+  }
+}
+
+function closeForm() {
+  document.getElementById('formOverlay').classList.remove('open');
+}
+
+function submitForm(mod) {
+  const name = document.getElementById('f-name').value;
+  const client = document.getElementById('f-client').value;
+  
+  if(!name || !client) {
+    alert('אנא הזן שם תיק ושם לקוח חובה.');
+    return;
+  }
+  
+  const typeSelect = document.getElementById('f-extraType');
+  const extraType = typeSelect ? typeSelect.value : 'standard';
+  
+  const newItem = {
+    id: '_' + Math.random().toString(36).substr(2, 9),
+    name,
+    client,
+    extraType,
+    details: document.getElementById('f-details') ? document.getElementById('f-details').value : '',
+    extra1: document.getElementById('f-extra1') ? document.getElementById('f-extra1').value : '',
+    extra2: document.getElementById('f-extra2') ? document.getElementById('f-extra2').value : '',
+    extra3: document.getElementById('f-extra3') ? document.getElementById('f-extra3').value : '',
+    notes: '',
+    date: new Date().toLocaleDateString('he-IL')
+  };
+  
+  store[mod].unshift(newItem);
+  saveStore();
+  closeForm();
+  renderModule(mod);
+}
+
+function renderDashboard() {
+  document.getElementById('dash-date').textContent = new Date().toLocaleDateString('he-IL', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+  
+  modulesList.forEach(m => {
+    const el = document.getElementById(`ds-${m}`);
+    if(el) el.textContent = store[m] ? store[m].length : 0;
+  });
+
+  const recentBox = document.getElementById('dash-recent');
+  recentBox.innerHTML = '';
+  let count = 0;
+
+  modulesList.forEach(m => {
+    if(store[m]) {
+      store[m].slice(0, 2).forEach(item => {
+        count++;
+        const div = document.createElement('div');
+        div.className = 'ds-item';
+        div.onclick = () => switchModule(m);
+        div.innerHTML = `
+          <div>
+            <div class="dsi-name">${item.name}</div>
+            <div class="dsi-sub">${item.client}</div>
+          </div>
+          <span class="dsi-badge" style="background:var(--gold-dim); color:var(--gold)">${moduleNames[m]}</span>
+        `;
+        recentBox.appendChild(div);
+      });
+    }
+  });
+
+  if(count === 0) {
+    recentBox.innerHTML = '<div style="padding:24px; text-align:center; color:var(--text-light)">אין תיקים רשומים במאגר עדיין</div>';
+  }
+
+  const dashLeads = document.getElementById('dash-leads-list');
+  dashLeads.innerHTML = '';
+  if(!store.leads || store.leads.length === 0) {
+    dashLeads.innerHTML = '<div style="padding:24px; text-align:center; color:var(--text-light)">אין פניות או לידים חדשים במערכת</div>';
+  } else {
+    store.leads.slice(0, 4).forEach(l => {
+      const div = document.createElement('div');
+      div.className = 'ds-item';
+      div.onclick = () => switchModule('leads');
+      div.innerHTML = `
+        <div>
+          <div class="dsi-name">${l.name}</div>
+          <div class="dsi-sub">${l.client}</div>
+        </div>
+        <span class="dsi-badge" style="background:var(--green-dim); color:var(--green)">חדש לפניה</span>
+      `;
+      dashLeads.appendChild(div);
+    });
+  }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  updateBadges();
+  renderDashboard();
+});
+</script>
+</body>
+</html>
