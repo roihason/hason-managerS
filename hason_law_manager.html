@@ -39,25 +39,15 @@ body{font-family:'Heebo',sans-serif;background:var(--bg-main);color:var(--text);
 .module{display:none;width:100%;height:100%;overflow:hidden}
 .module.active{display:flex}
 
-/* DASHBOARD */
-.dashboard{flex:1;overflow-y:auto;padding:32px;background:var(--bg-main)}
-.dash-welcome{margin-bottom:28px}
+/* DASHBOARD - FIXED HIERARCHY (TABLES ON TOP) */
+.dashboard{flex:1;overflow-y:auto;padding:32px;background:var(--bg-main);display:flex;flex-direction:column;gap:24px}
+.dash-welcome{margin-bottom:4px}
 .dash-title{font-size:24px;font-weight:700;color:var(--dark)}
 .dash-sub{font-size:13px;color:var(--text-dim);margin-top:4px}
 
-.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:32px}
-.stat-card{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:20px;cursor:pointer;transition:all 0.2s;box-shadow:0 2px 4px rgba(0,0,0,0.01);position:relative;overflow:hidden}
-.stat-card:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,0.04);border-color:rgba(184,134,11,0.2)}
-.stat-card::before{content:'';position:absolute;top:0;right:0;width:4px;height:100%}
-.stat-card.reg::before{background:var(--gold)}
-.stat-card.tx::before{background:var(--amber)}
-.stat-card.poa::before{background:var(--blue)}
-.stat-card.will::before{background:var(--purple)}
-.stat-icon{font-size:28px;margin-bottom:12px}
-.stat-label{font-size:12px;color:var(--text-light);font-weight:600;margin-bottom:4px}
-.stat-num{font-size:28px;font-weight:700;color:var(--dark)}
+.dash-sections{display:grid;grid-template-columns:1fr 1fr;gap:20px;order:1} /* Tables are now first in order */
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;order:2} /* Stats moved below tables */
 
-.dash-sections{display:grid;grid-template-columns:1fr 1fr;gap:20px}
 .dash-section{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;overflow:hidden;box-shadow:0 2px 4px rgba(0,0,0,0.01)}
 .ds-header{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;background:#FFF}
 .ds-title{font-size:13px;font-weight:600;color:var(--text);letter-spacing:0.5px}
@@ -68,6 +58,17 @@ body{font-family:'Heebo',sans-serif;background:var(--bg-main);color:var(--text);
 .dsi-name{font-size:13px;font-weight:500;color:var(--text)}
 .dsi-sub{font-size:11px;color:var(--text-light);margin-top:2px}
 .dsi-badge{font-size:10px;font-weight:600;padding:2px 8px;border-radius:12px}
+
+.stat-card{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:20px;cursor:pointer;transition:all 0.2s;box-shadow:0 2px 4px rgba(0,0,0,0.01);position:relative;overflow:hidden}
+.stat-card:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,0.04);border-color:rgba(184,134,11,0.2)}
+.stat-card::before{content:'';position:absolute;top:0;right:0;width:4px;height:100%}
+.stat-card.reg::before{background:var(--gold)}
+.stat-card.tx::before{background:var(--amber)}
+.stat-card.poa::before{background:var(--blue)}
+.stat-card.will::before{background:var(--purple)}
+.stat-icon{font-size:28px;margin-bottom:12px}
+.stat-label{font-size:12px;color:var(--text-light);font-weight:600;margin-bottom:4px}
+.stat-num{font-size:28px;font-weight:700;color:var(--dark)}
 
 /* SIDEBAR */
 .sidebar{width:300px;min-width:300px;background:#FFFFFF;border-left:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;flex-shrink:0}
@@ -103,7 +104,15 @@ body{font-family:'Heebo',sans-serif;background:var(--bg-main);color:var(--text);
 .ch-top{display:flex;justify-content:space-between;align-items:center}
 .ch-name{font-size:22px;font-weight:700;color:var(--dark)}
 .ch-sub{font-size:13px;color:var(--text-dim);margin-top:4px}
-.case-btns{display:flex;gap:8px}
+.case-btns{display:flex;gap:12px;align-items:center}
+
+/* CONVERT & ACTION BUTTONS */
+.convert-box{display:flex;align-items:center;gap:6px;background:var(--bg-main);padding:6px 12px;border-radius:8px;border:1px solid var(--border)}
+.convert-label{font-size:11px;font-weight:600;color:var(--text-dim)}
+.convert-select{padding:4px 8px;font-family:inherit;font-size:12px;border-radius:6px;border:1px solid var(--border);outline:none;cursor:pointer}
+.btn-convert-go{background:var(--gold);color:#fff;border:none;padding:5px 12px;font-size:12px;font-weight:600;border-radius:6px;cursor:pointer}
+.btn-convert-go:hover{background:var(--gold-light)}
+
 .btn-del{background:var(--red-dim);border:1px solid rgba(204,51,51,0.15);color:var(--red);border-radius:8px;padding:8px 16px;font-size:12px;font-weight:500;cursor:pointer;transition:all 0.2s}
 .btn-del:hover{background:var(--red);color:#FFFFFF}
 
@@ -117,13 +126,6 @@ body{font-family:'Heebo',sans-serif;background:var(--bg-main);color:var(--text);
 .mi-card{background:var(--bg-main);border:1px solid var(--border);border-radius:8px;padding:12px 16px}
 .ml{font-size:11px;color:var(--text-light);font-weight:600;margin-bottom:4px}
 .mv{font-size:13px;font-weight:600;color:var(--text)}
-
-/* WORKSPACE COMPONENTS */
-.checklist-item{display:flex;align-items:center;gap:12px;padding:10px 14px;background:var(--bg-main);border:1px solid var(--border);border-radius:8px;margin-bottom:8px}
-.chk-box{width:18px;height:18px;border-radius:4px;border:2px solid var(--text-light);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.2s}
-.checklist-item.done .chk-box{background:var(--green);border-color:var(--green)}
-.checklist-item.done .chk-box::after{content:'✓';color:#fff;font-size:11px;font-weight:bold}
-.checklist-item.done .chk-text{text-decoration:line-through;color:var(--text-light)}
 
 .timeline-box{position:relative;padding-right:20px;border-right:2px solid var(--border);margin-right:8px}
 .tl-node{position:relative;padding-bottom:16px}
@@ -143,7 +145,8 @@ body{font-family:'Heebo',sans-serif;background:var(--bg-main);color:var(--text);
 .fi{width:100%;background:var(--bg-main);border:1px solid var(--border);border-radius:8px;padding:10px 14px;color:var(--text);font-size:13px;font-family:inherit;outline:none;direction:rtl;transition:all 0.2s}
 .fi:focus{border-color:var(--gold);background:#FFF;box-shadow:0 0 0 3px var(--gold-dim)}
 .form-actions{display:flex;gap:12px;margin-top:24px}
-.form-actions .btn-pri{flex:1;padding:12px;font-size:14px;border-radius:8px}
+.form-actions .btn-pri{flex:1;background:var(--gold);color:#fff;border:none;padding:12px;font-size:14px;border-radius:8px;font-weight:600;cursor:pointer}
+.form-actions .btn-pri:hover{background:var(--gold-light)}
 
 /* LOGIN SCREEN */
 #loginScreen{position:fixed;inset:0;background:var(--bg-main);z-index:99999;display:flex;align-items:center;justify-content:center;direction:rtl}
@@ -183,7 +186,7 @@ body{font-family:'Heebo',sans-serif;background:var(--bg-main);color:var(--text);
     <div class="nav-tab" id="tab-poa" onclick="switchModule('poa')">📄 יפויי כוח מתמשך <span class="tab-badge" id="b-poa">0</span></div>
     <div class="nav-tab" id="tab-will" onclick="switchModule('will')">📜 צוואות וירושות <span class="tab-badge" id="b-will">0</span></div>
     <div class="nav-tab" id="tab-lit" onclick="switchModule('lit')">🏛 ליטיגציה ובימ"ש <span class="tab-badge" id="b-lit">0</span></div>
-    <div class="nav-tab" id="tab-notary" onclick="switchModule('notary')">🏛 אימות נוטריוני <span class="tab-badge" id="b-notary">0</span></div>
+    <div class="nav-tab" id="tab-notary" onclick="switchModule('notary')">✒️ אימות נוטריוני <span class="tab-badge" id="b-notary">0</span></div>
     <div class="nav-tab" id="tab-leads" onclick="switchModule('leads')">🎯 לידים ופניות <span class="tab-badge" id="b-leads">0</span></div>
   </div>
 </div>
@@ -197,13 +200,6 @@ body{font-family:'Heebo',sans-serif;background:var(--bg-main);color:var(--text);
         <div class="dash-sub" id="dash-date"></div>
       </div>
       
-      <div class="stats-grid">
-        <div class="stat-card reg" onclick="switchModule('reg')"><div class="stat-icon">📋</div><div class="stat-label">נדל"ן ורישומים</div><div class="stat-num" id="ds-reg">0</div></div>
-        <div class="stat-card tx" onclick="switchModule('tx')"><div class="stat-icon">🤝</div><div class="stat-label">חוזי מכר ורכישה</div><div class="stat-num" id="ds-tx">0</div></div>
-        <div class="stat-card poa" onclick="switchModule('poa')"><div class="stat-icon">📄</div><div class="stat-label">יפויי כוח פעילים</div><div class="stat-num" id="ds-poa">0</div></div>
-        <div class="stat-card will" onclick="switchModule('will')"><div class="stat-icon">📜</div><div class="stat-label">צוואות וירושה</div><div class="stat-num" id="ds-will">0</div></div>
-      </div>
-      
       <div class="dash-sections">
         <div class="dash-section">
           <div class="ds-header"><div class="ds-title">📂 תיקים אחרונים שנוספו למערכת</div></div>
@@ -211,359 +207,4 @@ body{font-family:'Heebo',sans-serif;background:var(--bg-main);color:var(--text);
         </div>
         <div class="dash-section">
           <div class="ds-header"><div class="ds-title">🎯 פניות ולידים חדשים לטיפול</div></div>
-          <div class="ds-body" id="dash-leads-list"></div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <script>
-    const modulesList = ['reg', 'tx', 'poa', 'will', 'lit', 'notary', 'leads'];
-    const moduleNames = {
-      reg: 'תיקי רישום ומקרקעין', tx: 'תיקי עסקאות מכר/רכישה', poa: 'תיקי יפוי כוח מתמשך',
-      will: 'צוואות ועזבונות', lit: 'תיקי ליטיגציה', notary: 'אישורים נוטריונים', leads: 'פניות חדשות'
-    };
-    
-    modulesList.forEach(m => {
-      document.write(`
-        <div class="module" id="mod-${m}">
-          <div class="sidebar">
-            <div class="sb-header">
-              <div class="sb-title">${moduleNames[m]}</div>
-              <div class="search-box">🔍<input placeholder="חיפוש מהיר ברשימה..." id="s-${m}" oninput="renderModule('${m}')"/></div>
-              <button class="add-btn-top" onclick="openForm('${m}')">➕ הוסף רשומה חדשה</button>
-            </div>
-            <div class="cases-list" id="list-${m}"></div>
-          </div>
-          <div class="content-area" id="ca-${m}">
-            <div class="empty-state"><div class="empty-icon">⚖️</div><div>בחר תיק מהרשימה הצידית או פתח רשומה חדשה לעבודה</div></div>
-          </div>
-        </div>
-      `);
-    });
-  </script>
-
-</div>
-
-<script>
-// Authentication Security Core
-const PASS = 'hason2025!';
-const SESSION_KEY = 'hason_auth_v1';
-
-function checkPassword(){
-  const input = document.getElementById('passwordInput').value;
-  if(input === PASS){
-    sessionStorage.setItem(SESSION_KEY, '1');
-    document.getElementById('loginScreen').style.display = 'none';
-  } else {
-    document.getElementById('loginError').textContent = '❌ סיסמת גישה שגויה. נסה שנית.';
-    document.getElementById('passwordInput').value = '';
-    setTimeout(()=>document.getElementById('loginError').textContent='', 3000);
-  }
-}
-
-if(sessionStorage.getItem(SESSION_KEY) === '1'){
-  document.addEventListener('DOMContentLoaded', ()=>{
-    document.getElementById('loginScreen').style.display = 'none';
-  });
-}
-
-// Database Layer LocalStorage Engine
-let store = JSON.parse(localStorage.getItem('hason_crm_store_v2')) || {
-  reg: [], tx: [], poa: [], will: [], lit: [], notary: [], leads: []
-};
-
-function saveStore() {
-  localStorage.setItem('hason_crm_store_v2', JSON.stringify(store));
-  updateBadges();
-  renderDashboard();
-}
-
-// Module Navigation System
-function switchModule(modId) {
-  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
-  document.querySelectorAll('.module').forEach(m => m.classList.remove('active'));
-  
-  const activeTab = document.getElementById(`tab-${modId}`);
-  if(activeTab) activeTab.classList.add('active');
-  
-  const activeModule = document.getElementById(`mod-${modId}`);
-  if(activeModule) activeModule.classList.add('active');
-
-  if(modId !== 'dash') {
-    renderModule(modId);
-  } else {
-    renderDashboard();
-  }
-}
-
-function updateBadges() {
-  modulesList.forEach(m => {
-    const badge = document.getElementById(`b-${m}`);
-    if(badge) badge.textContent = store[m].length;
-  });
-}
-
-// Sidebar Rendering Engine
-function renderModule(mod) {
-  const container = document.getElementById(`list-${mod}`);
-  if(!container) return;
-  
-  const searchVal = document.getElementById(`s-${mod}`).value.toLowerCase();
-  container.innerHTML = '';
-  
-  const filtered = store[mod].filter(item => 
-    item.name.toLowerCase().includes(searchVal) || 
-    item.client.toLowerCase().includes(searchVal)
-  );
-  
-  if(filtered.length === 0) {
-    container.innerHTML = '<div style="padding:24px; text-align:center; color:var(--text-light)">אין תוצאות תואמות</div>';
-    return;
-  }
-  
-  filtered.forEach(item => {
-    const div = document.createElement('div');
-    div.className = 'case-item';
-    div.onclick = () => showItemDetails(mod, item.id);
-    div.innerHTML = `
-      <div class="ci-top">
-        <span class="ci-name">${item.name}</span>
-        <span class="ci-date">${item.date}</span>
-      </div>
-      <div class="ci-sub">${item.client}</div>
-    `;
-    container.appendChild(div);
-  });
-}
-
-// Workspace Detailed View Renderer
-function showItemDetails(mod, id) {
-  const item = store[mod].find(i => i.id === id);
-  const workspace = document.getElementById(`ca-${mod}`);
-  if(!item || !workspace) return;
-  
-  // Custom Dynamic Workspace Sections based on type
-  let dynamicInputsHTML = '';
-  if(mod === 'tx') {
-    dynamicInputsHTML = `
-      <div class="meta-grid">
-        <div class="mi-card"><div class="ml">סוג עסקה</div><div class="mv" style="color:var(--gold)">${item.extra1 || 'מכר/רכישה'}</div></div>
-        <div class="mi-card"><div class="ml">שווי נכס משוער</div><div class="mv">${item.extra2 || 'לא הוזן'}</div></div>
-        <div class="mi-card"><div class="ml">סטטוס תשלום שכ"ט</div><div class="mv">${item.extra3 || 'בטיפול'}</div></div>
-      </div>
-    `;
-  } else if (mod === 'lit') {
-    dynamicInputsHTML = `
-      <div class="meta-grid">
-        <div class="mi-card"><div class="ml">מספר תיק בית משפט</div><div class="mv">${item.extra1 || 'טרם נקבע'}</div></div>
-        <div class="mi-card"><div class="ml">ערכאה משפטית</div><div class="mv">${item.extra2 || 'לא נקבע'}</div></div>
-        <div class="mi-card"><div class="ml">מועד דיון קרוב</div><div class="mv" style="color:var(--red); font-weight:bold">${item.extra3 || 'אין דיון קרוב'}</div></div>
-      </div>
-    `;
-  } else {
-    dynamicInputsHTML = `
-      <div class="meta-grid">
-        <div class="mi-card"><div class="ml">פרטים מזהים</div><div class="mv">${item.details || 'אין פירוט נוסף'}</div></div>
-        <div class="mi-card"><div class="ml">מטפל בתיק</div><div class="mv">עו"ד רועי חסון</div></div>
-        <div class="mi-card"><div class="ml">סטטוס תיק</div><div class="mv" style="color:var(--green)">פעיל בטיפול</div></div>
-      </div>
-    `;
-  }
-
-  workspace.innerHTML = `
-    <div class="case-header">
-      <div class="ch-top">
-        <div>
-          <div class="ch-name">${item.name}</div>
-          <div class="ch-sub">לקוח פונה: <strong>${item.client}</strong> | תאריך פתיחה במערכת: ${item.date}</div>
-        </div>
-        <div class="case-btns">
-          <button class="btn-del" onclick="deleteItem('${mod}', '${id}')">🗑 מחק תיק לצמיתות</button>
-        </div>
-      </div>
-    </div>
-    
-    <div class="sec">
-      <div class="sec-title">📌 נתוני מפתח ומאפייני התיק</div>
-      ${dynamicInputsHTML}
-    </div>
-
-    <div class="sec">
-      <div class="sec-title">📝 הערות עבודה, משימות ומעקב שוטף</div>
-      <textarea style="width:100%; min-height:140px; padding:16px; border:1px solid var(--border); border-radius:10px; font-family:inherit; font-size:13px; line-height:1.6; outline:none; background:var(--bg-main)" 
-        placeholder="רשום עדכונים שוטפים, שיחות טלפון עם הלקוח או פעולות שבוצעו מול הטאבו/רשויות המס..." 
-        onblur="saveNotes('${mod}', '${id}', this.value)">${item.notes || ''}</textarea>
-    </div>
-
-    <div class="sec">
-      <div class="sec-title">⏱ היסטוריית פעולות (Timeline)</div>
-      <div class="timeline-box">
-        <div class="tl-node">
-          <div class="tl-time">${item.date}</div>
-          <div class="tl-text">התיק נפתח במערכת והוגדר בסטטוס ראשוני.</div>
-        </div>
-      </div>
-    </div>
-  `;
-}
-
-function saveNotes(mod, id, val) {
-  const item = store[mod].find(i => i.id === id);
-  if(item) {
-    item.notes = val;
-    localStorage.setItem('hason_crm_store_v2', JSON.stringify(store));
-  }
-}
-
-function deleteItem(mod, id) {
-  if(confirm('האם אתה בטוח לחלוטין שברצונך למחוק רשומה זו? הפעולה אינה ניתנת לביטול.')) {
-    store[mod] = store[mod].filter(i => i.id !== id);
-    saveStore();
-    renderModule(mod);
-    document.getElementById(`ca-${mod}`).innerHTML = `<div class="empty-state"><div class="empty-icon">⚖️</div><div>הרשומה נמחקה בהצלחה מהמאגר</div></div>`;
-  }
-}
-
-// Smart Intelligent Dynamic Form Dialog Generator
-function openForm(mod) {
-  const overlay = document.getElementById('formOverlay');
-  const card = document.getElementById('formCard');
-  
-  let dynamicInputsFields = '';
-  
-  if(mod === 'tx') {
-    dynamicInputsFields = `
-      <div class="fg"><label class="fl">סוג העסקה</label><input type="text" id="f-extra1" class="fi" placeholder="לדוגמה: מכר דירת מגורים / רכישת מגרש"></div>
-      <div class="fg"><label class="fl">שווי הנכס בחוזה (בשקלים)</label><input type="text" id="f-extra2" class="fi" placeholder="לדוגמה: 2,450,000 שח"></div>
-      <div class="fg"><label class="fl">סיכום שכ"ט מוסכם</label><input type="text" id="f-extra3" class="fi" placeholder="לדוגמה: 0.5% + מעמ"></div>
-    `;
-  } else if (mod === 'lit') {
-    dynamicInputsFields = `
-      <div class="fg"><label class="fl">מספר תיק בית משפט / מספר תיק הוצל"פ</label><input type="text" id="f-extra1" class="fi" placeholder="לדוגמה: תאק 14254-02-26"></div>
-      <div class="fg"><label class="fl">בית משפט וערכאה</label><input type="text" id="f-extra2" class="fi" placeholder="לדוגמה: השלום נתניה"></div>
-      <div class="fg"><label class="fl">מועד דיון קרוב או הגשת כתב הגנה</label><input type="text" id="f-extra3" class="fi" placeholder="לדוגמה: 14/09/2026 09:30"></div>
-    `;
-  } else {
-    dynamicInputsFields = `
-      <div class="fg"><label class="fl">פרטים מזהים ומידע כללי חיוני</label><input type="text" id="f-details" class="fi" placeholder="גוש חלקה, מספר דרכון, או פרטי צוואה"></div>
-    `;
-  }
-
-  card.innerHTML = `
-    <div class="form-title">
-      <span>➕ יצירת רשומה חדשה במערכת</span>
-      <span class="form-close" onclick="closeForm()">×</span>
-    </div>
-    <div class="fg">
-      <label class="fl">שם התיק / תיאור קצר</label>
-      <input type="text" id="f-name" class="fi" placeholder="לדוגמה: צוואת המנוח אברהם כהן זל">
-    </div>
-    <div class="fg">
-      <label class="fl">שם הלקוח / הפונה (כולל טלפון נייד)</label>
-      <input type="text" id="f-client" class="fi" placeholder="שם מלא ומספר טלפון ליצירת קשר">
-    </div>
-    ${dynamicInputsFields}
-    <div class="form-actions">
-      <button class="btn-pri" onclick="submitForm('${mod}')">שמור רשומה ומפתח תיק</button>
-    </div>
-  `;
-  overlay.classList.add('open');
-}
-
-function closeForm() {
-  document.getElementById('formOverlay').classList.remove('open');
-}
-
-function submitForm(mod) {
-  const name = document.getElementById('f-name').value;
-  const client = document.getElementById('f-client').value;
-  
-  if(!name || !client) {
-    alert('אנא הזן שם תיק ושם לקוח חובה להמשך התהליך.');
-    return;
-  }
-  
-  const newItem = {
-    id: '_' + Math.random().toString(36).substr(2, 9),
-    name,
-    client,
-    details: document.getElementById('f-details') ? document.getElementById('f-details').value : '',
-    extra1: document.getElementById('f-extra1') ? document.getElementById('f-extra1').value : '',
-    extra2: document.getElementById('f-extra2') ? document.getElementById('f-extra2').value : '',
-    extra3: document.getElementById('f-extra3') ? document.getElementById('f-extra3').value : '',
-    notes: '',
-    date: new Date().toLocaleDateString('he-IL')
-  };
-  
-  store[mod].unshift(newItem);
-  saveStore();
-  closeForm();
-  renderModule(mod);
-}
-
-// Dashboard Dynamic Rendering Analytics Engine
-function renderDashboard() {
-  document.getElementById('dash-date').textContent = new Date().toLocaleDateString('he-IL', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-  
-  modulesList.forEach(m => {
-    const el = document.getElementById(`ds-${m}`);
-    if(el) el.textContent = store[m].length;
-  });
-
-  // Recent files render
-  const recentBox = document.getElementById('dash-recent');
-  recentBox.innerHTML = '';
-  let count = 0;
-
-  modulesList.forEach(m => {
-    store[m].slice(0, 2).forEach(item => {
-      count++;
-      const div = document.createElement('div');
-      div.className = 'ds-item';
-      div.onclick = () => switchModule(m);
-      div.innerHTML = `
-        <div>
-          <div class="dsi-name">${item.name}</div>
-          <div class="dsi-sub">${item.client}</div>
-        </div>
-        <span class="dsi-badge" style="background:var(--gold-dim); color:var(--gold)">${m.toUpperCase()}</span>
-      `;
-      recentBox.appendChild(div);
-    });
-  });
-
-  if(count === 0) {
-    recentBox.innerHTML = '<div style="padding:24px; text-align:center; color:var(--text-light)">אין תיקים רשומים במאגר עדיין</div>';
-  }
-
-  // Dashboard leads block
-  const dashLeads = document.getElementById('dash-leads-list');
-  dashLeads.innerHTML = '';
-  if(store.leads.length === 0) {
-    dashLeads.innerHTML = '<div style="padding:24px; text-align:center; color:var(--text-light)">אין פניות או לידים חדשים במערכת</div>';
-  } else {
-    store.leads.slice(0, 4).forEach(l => {
-      const div = document.createElement('div');
-      div.className = 'ds-item';
-      div.onclick = () => switchModule('leads');
-      div.innerHTML = `
-        <div>
-          <div class="dsi-name">${l.name}</div>
-          <div class="dsi-sub">${l.client}</div>
-        </div>
-        <span class="dsi-badge" style="background:var(--green-dim); color:var(--green)">חדש לפניה</span>
-      `;
-      dashLeads.appendChild(div);
-    });
-  }
-}
-
-// Window On-Load Bootstrapper
-document.addEventListener('DOMContentLoaded', () => {
-  updateBadges();
-  renderDashboard();
-});
-</script>
-</body>
-</html>
+          <div class="
