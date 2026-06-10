@@ -894,84 +894,15 @@ function switchModule(mod){
   currentModule=mod;
   document.querySelectorAll('.module').forEach(m=>m.classList.remove('active'));
   document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
-  document.getElementById('mod-'+mod).classList.add('active');
-  document.getElementById('tab-'+mod).classList.add('active');
-  if(mod==='other'){
-    const ost=OTHER_SUBTYPES[c.subtype]||OTHER_SUBTYPES.other;
-    stageName=OTHER_STAGES[c.stage-1]||'';
-    sub=c.description||c.name;
-    progress=Math.round((c.stage/OTHER_STAGES.length)*100);
-    pills=`<span class="pill ${ost.color}">${ost.label}</span><span class="pill gold">${stageName}</span>`;
-  }
-  if(mod==='other'){
-    const newOther={id,name:g('ff-name'),phone:g('ff-phone'),idNum:g('ff-id'),fee:gn('ff-fee'),
-      subtype:g('ff-other-subtype')||'other',description:g('ff-description'),
-      notes:'',status:'פתוח',stage:1,created:now,
-      timeline:[{t:'פתיחת תיק',d:now,c:'gold'}]};
-    DB.other.unshift(newOther);
-    closeForm();switchModule('other');
-    setTimeout(()=>{render('other');selectCase('other',id);},50);
-    saveDB();renderDash();return;
-  }
-  if(mod==='notary'){
-    const nst=NOTARY_SUBTYPES[c.subtype]||NOTARY_SUBTYPES.other;
-    const stages=getNotaryStages(c);
-    stageName=stages[c.stage-1]||'';
-    sub=c.address||c.docType||'';
-    progress=Math.round((c.stage/stages.length)*100);
-    pills=`<span class="pill ${nst.color}">${nst.label}</span><span class="pill gold">${stageName}</span>`;
-  }
-  if(mod==='other'){
-    const ost=OTHER_SUBTYPES[c.subtype]||OTHER_SUBTYPES.other;
-    stageName=OTHER_STAGES[c.stage-1]||'';
-    sub=c.description||c.name;
-    progress=Math.round((c.stage/OTHER_STAGES.length)*100);
-    pills=`<span class="pill ${ost.color}">${ost.label}</span><span class="pill gold">${stageName}</span>`;
-  }
-  if(mod==='other'){
-    const newOther={id,name:g('ff-name'),phone:g('ff-phone'),idNum:g('ff-id'),fee:gn('ff-fee'),
-      subtype:g('ff-other-subtype')||'other',description:g('ff-description'),
-      notes:'',status:'פתוח',stage:1,created:now,
-      timeline:[{t:'פתיחת תיק',d:now,c:'gold'}]};
-    DB.other.unshift(newOther);
-    closeForm();switchModule('other');
-    setTimeout(()=>{render('other');selectCase('other',id);},50);
-    saveDB();renderDash();return;
-  }
-  if(mod==='notary'){
-    const subtype=g('ff-notary-subtype')||'other';
-    const newNotary={id,name:g('ff-name'),phone:g('ff-phone'),idNum:g('ff-id'),fee:gn('ff-fee'),
-      subtype,notes2:g('ff-notes2'),notes:'',status:'בהכנה',stage:1,authDate:'',
-      created:new Date().toLocaleDateString('he-IL'),
-      timeline:[{t:'פתיחת תיק נוטריון',d:new Date().toLocaleDateString('he-IL'),c:'gold'}]};
-    DB.notary.unshift(newNotary);
-    closeForm();switchModule('notary');
-    setTimeout(()=>{render('notary');selectCase('notary',id);},50);
-    saveDB();renderDash();return;
-  }
+  const modEl=document.getElementById('mod-'+mod);
+  const tabEl=document.getElementById('tab-'+mod);
+  if(modEl) modEl.classList.add('active');
+  if(tabEl) tabEl.classList.add('active');
+  if(mod==='dash'){renderDash();return;}
   if(mod==='leads'){renderLeads();return;}
-  if(mod==='other'){
-    const ost=OTHER_SUBTYPES[c.subtype]||OTHER_SUBTYPES.other;
-    stageName=OTHER_STAGES[c.stage-1]||'';
-    sub=c.description||c.name;
-    progress=Math.round((c.stage/OTHER_STAGES.length)*100);
-    pills=`<span class="pill ${ost.color}">${ost.label}</span><span class="pill gold">${stageName}</span>`;
-  }
-  if(mod==='other'){
-    const newOther={id,name:g('ff-name'),phone:g('ff-phone'),idNum:g('ff-id'),fee:gn('ff-fee'),
-      subtype:g('ff-other-subtype')||'other',description:g('ff-description'),
-      notes:'',status:'פתוח',stage:1,created:now,
-      timeline:[{t:'פתיחת תיק',d:now,c:'gold'}]};
-    DB.other.unshift(newOther);
-    closeForm();switchModule('other');
-    setTimeout(()=>{render('other');selectCase('other',id);},50);
-    saveDB();renderDash();return;
-  }
-  if(mod==='notary'){render('notary');return;}
-  if(mod==='other'){render('other');return;}
-  if(mod!=='dash') render(mod);
-  else renderDash();
+  render(mod);
 }
+
 
 // ============================================================
 // DASHBOARD
@@ -1059,15 +990,24 @@ function renderDash(){
 // RENDER LIST
 // ============================================================
 function render(mod){
+  // Ensure DB array exists
+  if(!DB[mod]) DB[mod]=[];
   const search=(document.getElementById('s-'+mod)?.value||'').toLowerCase();
   const f=filters[mod]||'all';
   let items=DB[mod].filter(c=>{
-    const ms=c.name.toLowerCase().includes(search)||(c.address||'').toLowerCase().includes(search)||(c.subject||'').toLowerCase().includes(search);
+    if(!c||!c.name) return false;
+    const ms=c.name.toLowerCase().includes(search)||
+             (c.address||'').toLowerCase().includes(search)||
+             (c.subject||'').toLowerCase().includes(search)||
+             (c.description||'').toLowerCase().includes(search)||
+             (c.notes2||'').toLowerCase().includes(search);
     const mt=f==='all'||(mod==='reg'?c.subtype===f:c.type===f);
     return ms&&mt;
   });
-  document.getElementById('b-'+mod).textContent=DB[mod].length;
-  document.getElementById('list-'+mod).innerHTML=items.map(c=>caseItemHTML(mod,c)).join('')||
+  const badge=document.getElementById('b-'+mod);
+  if(badge) badge.textContent=DB[mod].length;
+  const list=document.getElementById('list-'+mod);
+  if(list) list.innerHTML=items.map(c=>caseItemHTML(mod,c)).join('')||
     '<div style="padding:18px;text-align:center;color:var(--text-dimmer);font-size:13px">לא נמצאו תיקים</div>';
 }
 
@@ -1118,12 +1058,14 @@ function renderContent(mod){
   // INNER TABS
   const tabs={
     reg:[['docs','📋 מסמכים'],['notes','הערות'],['timeline','היסטוריה']],
-    tx:[['docs','📋 מסמכים'],['finance','💰 פיננסי'],['notes','הערות'],['timeline','היסטוריה']],
+    tx:[['docs','📋 מסמכים'],['deadlines','📅 מועדים'],['finance','💰 פיננסי'],['notes','הערות'],['timeline','היסטוריה']],
     poa:[['attorneys','👥 ממונים'],['instructions','📝 הנחיות'],['dates','📅 תאריכים'],['timeline','היסטוריה']],
     will:[['heirs','👨‍👩‍👧 יורשים'],['assets','🏠 נכסים'],['dates','📅 תאריכים'],['notes','הערות'],['timeline','היסטוריה']],
-    lit:[['hearings','📅 דיונים'],['briefs','📄 כתבי טענות'],['verdict','🏁 תוצאה'],['notes','הערות'],['timeline','היסטוריה']]
+    lit:[['deadlines','📅 מועדים'],['hearings','⚖️ דיונים'],['briefs','📄 כתבי טענות'],['verdict','🏁 תוצאה'],['notes','הערות'],['timeline','היסטוריה']],
+    notary:[['details','📋 פרטים'],['notes','הערות'],['timeline','היסטוריה']],
+    other:[['details','📋 פרטים'],['notes','הערות'],['timeline','היסטוריה']]
   };
-  const tabsHTML=tabs[mod].map(([id,label])=>`<div class="it${innerTab[mod]===id?' active':''}" onclick="setIT('${mod}','${id}')">${label}</div>`).join('');
+  const tabsHTML=(tabs[mod]||[['notes','הערות'],['timeline','היסטוריה']]).map(([id,label])=>`<div class="it${innerTab[mod]===id?' active':''}" onclick="setIT('${mod}','${id}')">${label}</div>`).join('');
 
   // CONTENT
   const content=renderTabContent(mod,c);
@@ -2243,6 +2185,12 @@ function loadDB() {
         if (!DB.leads) DB.leads = [];
       if (!DB.notary) DB.notary = [];
       if (!DB.other) DB.other = [];
+      if (!DB.leads) DB.leads = [];
+      if (!DB.reg) DB.reg = [];
+      if (!DB.tx) DB.tx = [];
+      if (!DB.poa) DB.poa = [];
+      if (!DB.will) DB.will = [];
+      if (!DB.lit) DB.lit = [];
       DB.lit.forEach(c=>{if(!c.procedure)c.procedure='';if(!c.deadlines)c.deadlines=[];});
       }
       showSaveStatus('✓ נתונים נטענו', 'green');
@@ -2273,6 +2221,12 @@ function loadDB() {
       if (!DB.leads) DB.leads = [];
       if (!DB.notary) DB.notary = [];
       if (!DB.other) DB.other = [];
+      if (!DB.leads) DB.leads = [];
+      if (!DB.reg) DB.reg = [];
+      if (!DB.tx) DB.tx = [];
+      if (!DB.poa) DB.poa = [];
+      if (!DB.will) DB.will = [];
+      if (!DB.lit) DB.lit = [];
       DB.lit.forEach(c=>{if(!c.procedure)c.procedure='';if(!c.deadlines)c.deadlines=[];});
       renderDash();
       ['tx','will','lit'].forEach(mod => {
