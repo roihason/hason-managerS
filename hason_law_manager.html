@@ -1780,6 +1780,45 @@ function openEditForm(mod, id){
       <div class="form-actions"><button class="btn-sec" onclick="closeForm()">ביטול</button><button class="btn-pri" onclick="saveEdit('${mod}',${id})">שמור שינויים</button></div>`;
   }
 
+  // Handle notary and other if no formHTML set
+  if(!formHTML){
+    if(mod==='notary'){
+      formHTML=`<div class="form-title"><span>✏️ עריכת תיק נוטריון</span><span class="form-close" onclick="closeForm()">×</span></div>
+        <div class="fg"><label class="fl">סוג מסמך</label>
+          <select class="fi" id="ff-notary-subtype">
+            <option value="poa" ${c.subtype==='poa'?'selected':''}>📄 יפוי כוח</option>
+            <option value="contract" ${c.subtype==='contract'?'selected':''}>📋 חוזה</option>
+            <option value="will" ${c.subtype==='will'?'selected':''}>📜 צוואה</option>
+            <option value="apostille" ${c.subtype==='apostille'?'selected':''}>🌐 אפוסטיל</option>
+            <option value="other" ${c.subtype==='other'?'selected':''}>📁 אחר</option>
+          </select>
+        </div>
+        <div class="fr"><div class="fg"><label class="fl">שם לקוח</label><input class="fi" id="ff-name" value="${c.name}"/></div><div class="fg"><label class="fl">טלפון</label><input class="fi" id="ff-phone" value="${c.phone||''}"/></div></div>
+        <div class="fr"><div class="fg"><label class="fl">ת.ז.</label><input class="fi" id="ff-id" value="${c.idNum||''}"/></div><div class="fg"><label class="fl">שכ"ט (₪)</label><input class="fi" id="ff-fee" type="number" value="${c.fee||0}"/></div></div>
+        <div class="fg"><label class="fl">תיאור המסמך</label><textarea class="fi" id="ff-notes2" rows="2" style="resize:none">${c.notes2||''}</textarea></div>
+        <div class="form-actions"><button class="btn-sec" onclick="closeForm()">ביטול</button><button class="btn-pri" onclick="saveEdit('${mod}',${id})">שמור</button></div>`;
+    } else if(mod==='other'){
+      formHTML=`<div class="form-title"><span>✏️ עריכת תיק</span><span class="form-close" onclick="closeForm()">×</span></div>
+        <div class="fg"><label class="fl">סוג תיק</label>
+          <select class="fi" id="ff-other-subtype">
+            <option value="heskemmamon" ${c.subtype==='heskemmamon'?'selected':''}>💍 הסכם ממון</option>
+            <option value="bdika" ${c.subtype==='bdika'?'selected':''}>🔍 בדיקת הסכם</option>
+            <option value="ychutzniut" ${c.subtype==='ychutzniut'?'selected':''}>🔒 ייעוץ משפטי</option>
+            <option value="other" ${c.subtype==='other'?'selected':''}>📁 אחר</option>
+          </select>
+        </div>
+        <div class="fr"><div class="fg"><label class="fl">שם לקוח</label><input class="fi" id="ff-name" value="${c.name}"/></div><div class="fg"><label class="fl">טלפון</label><input class="fi" id="ff-phone" value="${c.phone||''}"/></div></div>
+        <div class="fr"><div class="fg"><label class="fl">ת.ז.</label><input class="fi" id="ff-id" value="${c.idNum||''}"/></div><div class="fg"><label class="fl">שכ"ט (₪)</label><input class="fi" id="ff-fee" type="number" value="${c.fee||0}"/></div></div>
+        <div class="fg"><label class="fl">תיאור התיק</label><textarea class="fi" id="ff-description" rows="2" style="resize:none">${c.description||''}</textarea></div>
+        <div class="form-actions"><button class="btn-sec" onclick="closeForm()">ביטול</button><button class="btn-pri" onclick="saveEdit('${mod}',${id})">שמור</button></div>`;
+    } else {
+      formHTML=`<div class="form-title"><span>✏️ עריכה</span><span class="form-close" onclick="closeForm()">×</span></div>
+        <div class="fr"><div class="fg"><label class="fl">שם</label><input class="fi" id="ff-name" value="${c.name}"/></div><div class="fg"><label class="fl">טלפון</label><input class="fi" id="ff-phone" value="${c.phone||''}"/></div></div>
+        <div class="fr"><div class="fg"><label class="fl">שכ"ט (₪)</label><input class="fi" id="ff-fee" type="number" value="${c.fee||0}"/></div><div class="fg"></div></div>
+        <div class="form-actions"><button class="btn-sec" onclick="closeForm()">ביטול</button><button class="btn-pri" onclick="saveEdit('${mod}',${id})">שמור</button></div>`;
+    }
+  }
+
   document.getElementById('formCard').innerHTML = formHTML;
   document.getElementById('formCard').dataset.mod = mod;
   document.getElementById('formOverlay').classList.add('open');
@@ -1856,6 +1895,17 @@ function saveEdit(mod, id){
     c.opposingAtty = g('ff-opposing');
     c.claim = gn('ff-claim');
     c.fee = gn('ff-fee');
+  }
+
+  // notary
+  if(mod==='notary'){
+    c.name=g('ff-name');c.phone=g('ff-phone');c.idNum=g('ff-id');c.fee=gn('ff-fee');
+    c.subtype=g('ff-notary-subtype')||c.subtype;c.notes2=g('ff-notes2');
+  }
+  // other
+  if(mod==='other'){
+    c.name=g('ff-name');c.phone=g('ff-phone');c.idNum=g('ff-id');c.fee=gn('ff-fee');
+    c.subtype=g('ff-other-subtype')||c.subtype;c.description=g('ff-description');
   }
 
   c.timeline = c.timeline || [];
