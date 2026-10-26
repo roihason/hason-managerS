@@ -1142,7 +1142,7 @@ function renderContent(mod){
   // INNER TABS
   const tabs={
     reg:[['docs','📋 מסמכים'],['notes','הערות'],['timeline','היסטוריה']],
-    tx:[['checklist','✅ צ'קליסט'],['docs','📋 מסמכים'],['deadlines','📅 מועדים'],['finance','💰 פיננסי'],['questions','❓ שאלות'],['drive','☁️ דרייב'],['notes','הערות'],['timeline','היסטוריה']],
+    tx:[['checklist','✅ צ׳קליסט'],['docs','📋 מסמכים'],['deadlines','📅 מועדים'],['finance','💰 פיננסי'],['questions','❓ שאלות'],['drive','☁️ דרייב'],['notes','הערות'],['timeline','היסטוריה']],
     poa:[['attorneys','👥 ממונים'],['instructions','📝 הנחיות'],['dates','📅 תאריכים'],['timeline','היסטוריה']],
     will:[['heirs','👨‍👩‍👧 יורשים'],['assets','🏠 נכסים'],['dates','📅 תאריכים'],['notes','הערות'],['timeline','היסטוריה']],
     lit:[['deadlines','📅 מועדים'],['hearings','⚖️ דיונים'],['briefs','📄 כתבי טענות'],['verdict','🏁 תוצאה'],['notes','הערות'],['timeline','היסטוריה']],
@@ -1317,7 +1317,7 @@ function renderTabContent(mod,c){
     const checklist=getTxChecklist(c);
     if(!c.checkItems)c.checkItems={};
     const stageIdx=c.stage||0;
-    let html='<div class="sec"><div class="sec-title">צ'קליסט עסקה</div>';
+    let html='<div class="sec"><div class="sec-title">צ׳קליסט עסקה</div>';
     stages.forEach((stageName,si)=>{
       const items=checklist[si]||[];
       const done=items.filter((_,ii)=>c.checkItems[si+'_'+ii]).length;
