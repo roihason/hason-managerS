@@ -231,6 +231,7 @@ body{font-family:'Heebo',sans-serif;background:var(--dark2);color:var(--text);he
 .pill.red{background:var(--red-dim);color:var(--red)}
 .pill.purple{background:var(--purple-dim);color:var(--purple)}
 .pill.teal{background:var(--teal-dim);color:var(--teal)}
+.pill.gray{background:rgba(0,0,0,0.06);color:var(--text-dim)}
 .mini-progress{background:var(--dark3);border-radius:4px;height:3px;overflow:hidden;margin-top:4px}
 .mini-progress-fill{height:100%;background:var(--gold);border-radius:4px;transition:width 0.3s}
 
@@ -405,6 +406,7 @@ body{font-family:'Heebo',sans-serif;background:var(--dark2);color:var(--text);he
     if(input === PASS){
       sessionStorage.setItem(SESSION_KEY, '1');
       document.getElementById('loginScreen').style.display = 'none';
+      setTimeout(()=>{if(typeof checkReminders==='function')checkReminders();},2500);
     } else {
       document.getElementById('loginError').textContent = '❌ סיסמה שגויה';
       document.getElementById('passwordInput').value = '';
@@ -439,6 +441,7 @@ body{font-family:'Heebo',sans-serif;background:var(--dark2);color:var(--text);he
     <div class="nav-tab" id="tab-lit" onclick="switchModule('lit')">🏛 ליטיגציה ובימ"ש <span class="tab-badge" id="b-lit">0</span></div>
     <div class="nav-tab" id="tab-notary" onclick="switchModule('notary')">✒️ אימות נוטריוני <span class="tab-badge" id="b-notary">0</span></div>
     <div class="nav-tab" id="tab-other" onclick="switchModule('other')">📁 אחר / כללי <span class="tab-badge" id="b-other">0</span></div>
+    <div class="nav-tab" id="tab-archive" onclick="switchModule('archive')">🗄 ארכיון <span class="tab-badge" id="b-archive">0</span></div>
     <div class="nav-tab" id="tab-leads" onclick="switchModule('leads')">🎯 לידים ופניות <span class="tab-badge" id="b-leads">0</span></div>
   </div>
 </div>
@@ -718,10 +721,81 @@ const REG_SUBTYPES = {
   bayit:   { label:'🏠 בית משותף',    color:'amber'  }
 };
 function getRegStages(c){ return REG_STAGES[c.subtype] || REG_STAGES.tabu; }
-const TX_STAGES_SELL=['פגישה/כוונות','בדיקת טאבו','ניסוח הסכם','חתימות+מקדמה','דיווח מיסים','תשלום מס שבח','הערת אזהרה','מסירת חזקה','סיום+יתרה','רישום זכויות'];
-const TX_STAGES_BUY=['פגישה/כוונות','בדיקת טאבו','ניסוח הסכם','חתימות+מקדמה','דיווח מיסים','תשלום מס רכישה','הערת אזהרה','מימון','מסירת חזקה','סיום+יתרה'];
-const TX_STAGES_RENT=['פגישה/כוונות','בדיקת נכס ומצב משפטי','ניסוח חוזה שכירות','חתימות','קבלת ערבויות+פיקדון','מסירת חזקה','סיום+תיוק'];
+// === עסקת מכר ===
+const TX_STAGES_SELL=['בדיקות מקדמיות','בדיקת מיסוי ומשכנתה','משא ומתן וניסוח הסכם','חתימה','דיווח למיסוי מקרקעין','ביצוע תשלומים וסילוק משכנתה','קבלת אישורים','מסירת החזקה','רישום זכויות','סגירת תיק'];
+const TX_CHECKLIST_SELL={
+  0:['זיהוי המוכר (ת.ז / ח.פ)','בדיקת נסח טאבו / רישום עדכני','בדיקת שעבודים ועיקולים','בדיקת זכויות בנייה ותב"ע','בדיקת חובות ארנונה ומים','בדיקת היטל השבחה','בדיקת אישור עירייה'],
+  1:['חישוב מס שבח צפוי','בדיקת פטורים ממס שבח','בדיקת סילוק משכנתא קיימת','קבלת אישור עקרוני מהבנק','תיאום עם יועץ מס'],
+  2:['גיבוש עקרונות עסקה','קביעת תמורה ולוח תשלומים','ניסוח הסכם מכר','בדיקת תנאים מתלים','הכנת ייפויי כוח נוטריאלי'],
+  3:['קריאת הסכם עם המוכר','חתימת הסכם מכר','קבלת מקדמה מהרוכש','רישום הערת אזהרה לטובת הרוכש','שמירת כספים בנאמנות'],
+  4:['הגשת דיווח למיסוי מקרקעין (שבח)','הגשת דיווח מס רכישה (לרוכש)','קבלת שומת מס שבח','מעקב אחר אישור שומה'],
+  5:['מעקב תשלומים לפי לוח','אישור קבלת תשלומים','תיאום סילוק משכנתא עם הבנק','קבלת אישור סילוק משכנתא','שחרור כספים מנאמנות'],
+  6:['קבלת אישור מס שבח (אפס חוב)','קבלת אישור עירייה','קבלת אישור ועד בית (אם רלוונטי)','קבלת אישור מס רכישה'],
+  7:['קביעת מועד מסירה','בדיקת מצב הנכס ביום המסירה','העברת מפתחות','פרוטוקול מסירה חתום','תשלום יתרה סופית'],
+  8:['הגשת בקשה לרישום העברה בטאבו','צירוף כל האישורים','תשלום אגרת טאבו','מעקב רישום','קבלת אישור רישום סופי'],
+  9:['שליחת מסמכים למרשח','הכנת חשבונית שכ"ט','סגירת תיק בהסכמה','ארכוב מסמכים']
+};
+const TX_QUESTIONS_SELL=[
+  'מה הסכום הכולל של העסקה ולוח התשלומים?',
+  'האם קיימת משכנתא על הנכס? מה יתרת הפירעון?',
+  'האם המוכר זכאי לפטור ממס שבח?',
+  'מה מועד המסירה המתוכנן?',
+  'האם ישנם דיירים/שוכרים בנכס?',
+  'האם קיימות הערות אזהרה קיימות על הנכס?',
+  'מה מצב הרישום הנוכחי (טאבו/מנהל/חברה משכנת)?',
+  'האם הוסכם על עניין ייפוי כוח בלתי חוזר?'
+];
+
+// === עסקת רכישה ===
+const TX_STAGES_BUY=['פתיחת תיק ובירור צרכי הרוכש','בדיקות משפטיות של הנכס','בדיקת מיסוי ועלויות','בדיקת מימון ומשכנתה','משא ומתן וניסוח הסכם','חתימה ודיווח לרשויות','ביצוע תשלומים ומעקב','קבלת החזקה','רישום זכויות','סגירת תיק'];
+const TX_CHECKLIST_BUY={
+  0:['פגישת היכרות ובירור צרכים','קבלת פרטי הנכס','בדיקת זהות המוכר','הגדרת תקציב ומימון','חתימת הסכם שכ"ט'],
+  1:['נסח טאבו עדכני','בדיקת תשריט/גוש חלקה','בדיקת שעבודים ועיקולים','בדיקת חריגות בנייה','בדיקת תב"ע וזכויות בנייה','אישור עירייה ללא חובות','בדיקת ועד בית/דמי ניהול'],
+  2:['חישוב מס רכישה','בדיקת זכאות להנחה/פטור','חישוב היטל השבחה','הערכת שכ"ט ועלויות נלוות','חישוב עלות כוללת לעסקה'],
+  3:['קבלת אישור עקרוני מהבנק','בחירת מסלול משכנתה','בדיקת שמאות מטעם הבנק','קבלת אישור משכנתה סופי','תיאום לוח תשלומים עם מסלול'],
+  4:['משא ומתן על מחיר ותנאים','ניסוח הסכם רכישה','קביעת תנאים מתלים','ניסוח ייפויי כוח','סיכום לוח תשלומים'],
+  5:['קריאת הסכם עם הרוכש','חתימת הסכם רכישה','תשלום מקדמה','רישום הערת אזהרה','הגשת דיווח מס רכישה','הגשת דיווח מס שבח (למוכר)'],
+  6:['מעקב תשלומים לפי לוח','ווידוא קבלת כספים','תיאום עם בנק למשכנתה','מעקב קבלת אישורים מהמוכר','שחרור כספים בהתאם'],
+  7:['קביעת מועד מסירה','בדיקת מצב הנכס','קבלת מפתחות','פרוטוקול מסירה','תשלום יתרה סופית'],
+  8:['הכנת מסמכי העברה','קבלת כל האישורים הנדרשים','הגשה לרישום בטאבו','מעקב הליך רישום','קבלת נסח טאבו מעודכן'],
+  9:['וידוא רישום סופי','שליחת מסמכים למרשח','הכנת חשבונית שכ"ט','ארכוב כל המסמכים','סגירת תיק']
+};
+const TX_QUESTIONS_BUY=[
+  'מה המחיר הסופי המוסכם ולוח התשלומים?',
+  'האם התקבל אישור משכנתה? מה הסכום המאושר?',
+  'האם הרוכש זכאי להנחה במס רכישה (דירה יחידה)?',
+  'מה מועד המסירה המצופה?',
+  'האם הנכס פנוי או מושכר? פרטי שוכרים?',
+  'האם נמצאו חריגות בנייה? כיצד טופלו?',
+  'מה מצב הרישום (טאבו/מנהל/חברה משכנת)?',
+  'האם נדרש ייפוי כוח בלתי חוזר?'
+];
+
+// === עסקת שכירות ===
+const TX_STAGES_RENT=['פתיחת תיק ובירור פרטים','בדיקת הנכס ומצב משפטי','ניסוח חוזה שכירות','חתימות','קבלת ערבויות ופיקדון','מסירת חזקה','סיום ותיוק'];
+const TX_CHECKLIST_RENT={
+  0:['זיהוי המשכיר והשוכר','פרטי הנכס המושכר','הגדרת תקופת השכירות','הגדרת דמי שכירות','הגדרת תנאי תשלום'],
+  1:['בדיקת בעלות/זכות להשכיר','בדיקת נסח טאבו','בדיקת אישורים לשכירות','בדיקת מצב הנכס'],
+  2:['ניסוח חוזה שכירות','קביעת תנאי אופציה','קביעת מנגנון הצמדה','קביעת תנאי ביטול','קביעת אחריות תחזוקה'],
+  3:['קריאת חוזה עם הצדדים','חתימת חוזה שכירות','אימות זהות חותמים'],
+  4:['קבלת ערבות בנקאית/שיקים','קבלת פיקדון','תיעוד הערבויות','ביטוח דירה'],
+  5:['קביעת מועד מסירה','בדיקת מצב הנכס','פרוטוקול מסירה','העברת מפתחות'],
+  6:['ארכוב חוזה','שליחת עותקים לצדדים','הכנת חשבונית שכ"ט','סגירת תיק']
+};
+const TX_QUESTIONS_RENT=[
+  'מה דמי השכירות החודשיים?',
+  'מה תקופת השכירות ואפשרות האופציה?',
+  'מהן הערבויות הנדרשות (בנקאית/שיקים)?',
+  'האם נדרש ביטוח דירה?',
+  'מי אחראי לתחזוקה שוטפת?',
+  'האם יש מנגנון הצמדה למדד?',
+  'מה תנאי הביטול המוקדם?',
+  'האם הנכס עם/בלי ריהוט?'
+];
+
 function getTxStages(c){return c.type==='sell'?TX_STAGES_SELL:c.type==='buy'?TX_STAGES_BUY:TX_STAGES_RENT;}
+function getTxChecklist(c){return c.type==='sell'?TX_CHECKLIST_SELL:c.type==='buy'?TX_CHECKLIST_BUY:TX_CHECKLIST_RENT;}
+function getTxQuestions(c){return c.type==='sell'?TX_QUESTIONS_SELL:c.type==='buy'?TX_QUESTIONS_BUY:TX_QUESTIONS_RENT;}
 function getStages(mod,c){
   if(mod==='reg') return getRegStages(c);
   if(mod==='tx') return getTxStages(c);
@@ -879,7 +953,7 @@ const TX_DOCS=[
 
 // Storage
 let DB = {
-  reg: [], tx: [], poa: [], will: [], lit: [], leads: [], notary: [], other: []
+  reg: [], tx: [], poa: [], will: [], lit: [], leads: [], notary: [], other: [], archive: []
 };
 
 let selected={reg:null,tx:null,poa:null,will:null,lit:null};
@@ -899,7 +973,17 @@ function switchModule(mod){
   if(modEl) modEl.classList.add('active');
   if(tabEl) tabEl.classList.add('active');
   if(mod==='dash'){renderDash();return;}
+  if(mod==='archive'){
+    const origMod=c.archivedFrom||'reg';
+    const modLabels={reg:'📋 רישום',tx:'🤝 עסקה',poa:'📄 יפוי כוח',will:'📜 צוואה',lit:'🏛 ליטיגציה',notary:'✒️ נוטריון',other:'📁 אחר'};
+    const modColors={reg:'gold',tx:'amber',poa:'blue',will:'purple',lit:'red',notary:'green',other:'gray'};
+    stageName=c.archivedDate||c.created;
+    sub=c.address||c.subject||c.notes2||c.description||'';
+    progress=100;
+    pills=`<span class="pill ${modColors[origMod]||'gold'}">${modLabels[origMod]||origMod}</span><span class="pill gray">🗄 סגור</span>`;
+  }
   if(mod==='leads'){renderLeads();return;}
+  if(mod==='archive'){render('archive');return;}
   render(mod);
 }
 
@@ -910,7 +994,7 @@ function switchModule(mod){
 function renderDash(){
   const now=new Date();
   document.getElementById('dash-date').textContent=now.toLocaleDateString('he-IL',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
-  ['reg','tx','poa','will','lit','leads','notary','other'].forEach(m=>{
+  ['reg','tx','poa','will','lit','leads','notary','other','archive'].forEach(m=>{
     const el=document.getElementById('ds-'+m);
     if(el)el.textContent=DB[m].length;
     const b=document.getElementById('b-'+m);
@@ -1032,7 +1116,7 @@ function caseItemHTML(mod,c){
 // ============================================================
 function selectCase(mod,id){
   selected[mod]=id;
-  innerTab[mod]=mod==='reg'?'docs':mod==='tx'?'deadlines':mod==='poa'?'attorneys':mod==='will'?'heirs':(mod==='notary'||mod==='other')?'details':'deadlines';
+  innerTab[mod]=mod==='reg'?'docs':mod==='tx'?'checklist':mod==='poa'?'attorneys':mod==='will'?'heirs':(mod==='notary'||mod==='other')?'details':'deadlines';
   render(mod);
   renderContent(mod);
 }
@@ -1050,7 +1134,7 @@ function renderContent(mod){
   // META
   let meta='';
   if(mod==='reg') meta=`<div class="mi"><div class="ml">טלפון</div><div class="mv">${c.phone}</div></div><div class="mi"><div class="ml">עו"ד נגדי</div><div class="mv">${c.opposing||'—'}</div></div><div class="mi"><div class="ml">גוש/חלקה</div><div class="mv gold">${c.gush}/${c.helka}</div></div><div class="mi"><div class="ml">שכ"ט</div><div class="mv gold">₪${Number(c.fee).toLocaleString()}</div></div>`;
-  if(mod==='tx'){const priceLabel=c.type==='rent'?'שכר דירה':'מחיר עסקה';meta=`<div class="mi"><div class="ml">טלפון</div><div class="mv">${c.phone}</div></div><div class="mi"><div class="ml">עו"ד נגדי</div><div class="mv">${c.opposing||'—'}</div></div><div class="mi"><div class="ml">${priceLabel}</div><div class="mv gold">₪${Number(c.price).toLocaleString()}</div></div><div class="mi"><div class="ml">מועד סיום</div><div class="mv amber">${c.deadline?new Date(c.deadline).toLocaleDateString('he-IL'):'—'}</div></div>`;}
+  if(mod==='tx'){const priceLabel=c.type==='rent'?'שכר דירה':'מחיר עסקה';meta=`<div class="mi"><div class="ml">טלפון</div><div class="mv">${c.phone}</div></div><div class="mi"><div class="ml">עו"ד נגדי</div><div class="mv">${c.opposing||'—'}</div></div><div class="mi"><div class="ml">${priceLabel}</div><div class="mv gold">₪${Number(c.price).toLocaleString()}</div></div><div class="mi"><div class="ml">מועד סיום</div><div class="mv amber">${c.deadline?new Date(c.deadline).toLocaleDateString('he-IL'):'—'}</div></div>${c.driveUrl?`<div class="mi" style="cursor:pointer" onclick="window.open('${c.driveUrl}','_blank')"><div class="ml">Google Drive</div><div class="mv" style="color:var(--gold)">📂 פתח תיק</div></div>`:''}\`;}
   if(mod==='poa') meta=`<div class="mi"><div class="ml">טלפון</div><div class="mv">${c.phone}</div></div><div class="mi"><div class="ml">ממונה ראשי</div><div class="mv gold">${c.attorneys[0]?.name||'—'}</div></div><div class="mi"><div class="ml">הפקדה</div><div class="mv ${c.filingRef?'teal':''}">${c.filingRef||'טרם הופקד'}</div></div><div class="mi"><div class="ml">שכ"ט</div><div class="mv gold">₪${Number(c.fee).toLocaleString()}</div></div>`;
   if(mod==='will') meta=`<div class="mi"><div class="ml">טלפון</div><div class="mv">${c.phone}</div></div><div class="mi"><div class="ml">יורשים</div><div class="mv gold">${c.heirs.length} יורשים</div></div><div class="mi"><div class="ml">מנהל עיזבון</div><div class="mv">${c.executor||'—'}</div></div><div class="mi"><div class="ml">הפקדה</div><div class="mv ${c.filingRef?'purple':''}">${c.filingRef||'טרם הופקדה'}</div></div>`;
   if(mod==='lit'){const nh=c.hearings.filter(h=>!h.past).sort((a,b)=>new Date(a.date)-new Date(b.date))[0];const procLabel=LIT_PROCEDURES[c.procedure]?LIT_PROCEDURES[c.procedure].label:'לא הוגדר';meta=`<div class="mi"><div class="ml">ביהמ"ש</div><div class="mv">${c.court}</div></div><div class="mi"><div class="ml">מס' תיק</div><div class="mv">${c.caseNum||'—'}</div></div><div class="mi"><div class="ml">מסגרת דיונית</div><div class="mv gold">${procLabel}</div></div><div class="mi"><div class="ml">דיון הבא</div><div class="mv amber">${nh?new Date(nh.date).toLocaleDateString('he-IL'):'אין'}</div></div><div class="mi"><div class="ml">סכום תביעה</div><div class="mv gold">₪${Number(c.claim).toLocaleString()}</div></div>`;}
@@ -1058,7 +1142,7 @@ function renderContent(mod){
   // INNER TABS
   const tabs={
     reg:[['docs','📋 מסמכים'],['notes','הערות'],['timeline','היסטוריה']],
-    tx:[['docs','📋 מסמכים'],['deadlines','📅 מועדים'],['finance','💰 פיננסי'],['notes','הערות'],['timeline','היסטוריה']],
+    tx:[['checklist','✅ צ'קליסט'],['docs','📋 מסמכים'],['deadlines','📅 מועדים'],['finance','💰 פיננסי'],['questions','❓ שאלות'],['drive','☁️ דרייב'],['notes','הערות'],['timeline','היסטוריה']],
     poa:[['attorneys','👥 ממונים'],['instructions','📝 הנחיות'],['dates','📅 תאריכים'],['timeline','היסטוריה']],
     will:[['heirs','👨‍👩‍👧 יורשים'],['assets','🏠 נכסים'],['dates','📅 תאריכים'],['notes','הערות'],['timeline','היסטוריה']],
     lit:[['deadlines','📅 מועדים'],['hearings','⚖️ דיונים'],['briefs','📄 כתבי טענות'],['verdict','🏁 תוצאה'],['notes','הערות'],['timeline','היסטוריה']],
@@ -1093,6 +1177,7 @@ function renderContent(mod){
             </select>
             <button onclick="executeModuleConvert('${mod}',${c.id})" style="background:var(--gold);color:#fff;border:none;padding:4px 10px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer">בצע</button>
           </div>
+          <button onclick="archiveCase('${mod}',${c.id})" style="background:var(--gray-dim,#f5f5f5);border:1px solid rgba(0,0,0,0.1);color:var(--text-dim);border-radius:8px;padding:7px 12px;font-size:12px;cursor:pointer;font-family:inherit;font-weight:500" title="העבר לארכיון">🗄 סגור תיק</button>
           <button class="btn-sec" onclick="openEditForm('${mod}',${c.id})">✏️</button>
           <button class="btn-del" onclick="deleteCase('${mod}',${c.id})">🗑</button>
         </div>
@@ -1227,7 +1312,70 @@ function renderTabContent(mod,c){
     </div>`;
   }
 
-  if(tab==='finance'&&mod==='tx'){
+    if(tab==='checklist'&&mod==='tx'){
+    const stages=getTxStages(c);
+    const checklist=getTxChecklist(c);
+    if(!c.checkItems)c.checkItems={};
+    const stageIdx=c.stage||0;
+    let html='<div class="sec"><div class="sec-title">צ'קליסט עסקה</div>';
+    stages.forEach((stageName,si)=>{
+      const items=checklist[si]||[];
+      const done=items.filter((_,ii)=>c.checkItems[si+'_'+ii]).length;
+      const isActive=si===stageIdx;
+      const isPast=si<stageIdx;
+      html+=`<div style="margin-bottom:12px;border:1px solid var(--border);border-radius:8px;overflow:hidden">
+        <div style="padding:10px 12px;background:${isActive?'var(--gold-dim, rgba(184,134,11,0.12))':isPast?'var(--surface-2)':'var(--surface)'};display:flex;align-items:center;gap:8px;cursor:pointer" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'block':'none'">
+          <div style="width:22px;height:22px;border-radius:50%;background:${isActive?'var(--gold)':isPast?'var(--green)':'var(--border)'};color:white;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center">${isPast?'✓':si+1}</div>
+          <div style="flex:1;font-size:13px;font-weight:${isActive?'700':'500'};color:${isActive?'var(--gold)':isPast?'var(--green)':'var(--text)'}">${stageName}</div>
+          <div style="font-size:11px;color:var(--text-dimmer)">${done}/${items.length}</div>
+        </div>
+        <div style="display:${isActive||isPast?'block':'none'}">
+          ${items.map((item,ii)=>{
+            const checked=!!c.checkItems[si+'_'+ii];
+            return`<div style="display:flex;align-items:center;gap:10px;padding:8px 14px;border-top:1px solid var(--border);cursor:pointer" onclick="toggleTxCheck('tx',${c.id},${si},${ii})">
+              <div style="width:18px;height:18px;border-radius:4px;border:2px solid ${checked?'var(--green)':'var(--border)'};background:${checked?'var(--green)':'transparent'};flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:11px;color:white">${checked?'✓':''}</div>
+              <div style="font-size:13px;color:${checked?'var(--text-dim)':'var(--text)'};text-decoration:${checked?'line-through':'none'}">${item}</div>
+            </div>`;
+          }).join('')}
+        </div>
+      </div>`;
+    });
+    html+='</div>';
+    return html;
+  }
+
+  if(tab==='questions'&&mod==='tx'){
+    const questions=getTxQuestions(c);
+    if(!c.questionAnswers)c.questionAnswers={};
+    return`<div class="sec">
+      <div class="sec-title">שאלות מנחות לעסקה</div>
+      ${questions.map((q,qi)=>`<div style="margin-bottom:14px">
+        <div style="font-size:13px;font-weight:600;margin-bottom:6px;color:var(--text)">${qi+1}. ${q}</div>
+        <textarea class="fi" rows="2" style="width:100%;resize:vertical" placeholder="הזן תשובה..." onchange="saveTxQuestion('tx',${c.id},${qi},this.value)">${c.questionAnswers[qi]||''}</textarea>
+      </div>`).join('')}
+    </div>`;
+  }
+
+  if(tab==='drive'&&mod==='tx'){
+    const driveUrl=c.driveUrl||'';
+    return`<div class="sec">
+      <div class="sec-title">קישור לתיק Google Drive</div>
+      <div class="card">
+        <div style="font-size:12px;color:var(--text-dim);margin-bottom:8px">הדבק כאן את הקישור לתיקייה ב-Google Drive</div>
+        <input class="fi" id="drive-url-${c.id}" type="url" placeholder="https://drive.google.com/drive/folders/..." value="${driveUrl}" style="margin-bottom:10px"/>
+        <div style="display:flex;gap:8px">
+          <button class="btn" onclick="saveDriveLink('tx',${c.id})">💾 שמור קישור</button>
+          ${driveUrl?`<button class="btn" style="background:var(--green)" onclick="window.open('${driveUrl}','_blank')">📂 פתח ב-Drive</button>`:''}
+        </div>
+      </div>
+      ${driveUrl?`<div style="margin-top:12px;padding:10px;background:var(--surface-2);border-radius:8px;font-size:12px;color:var(--text-dim)">
+        <span style="font-weight:600">קישור קיים: </span>
+        <a href="${driveUrl}" target="_blank" style="color:var(--gold);word-break:break-all">${driveUrl}</a>
+      </div>`:''}
+    </div>`;
+  }
+
+if(tab==='finance'&&mod==='tx'){
     const paid=c.payments.filter(p=>p.paid).reduce((s,p)=>s+p.amount,0);
     return`<div class="sec">
       <div class="fin-grid">
@@ -2085,6 +2233,48 @@ function doConvertLead(leadId,mod){
 // ============================================================
 // DELETE CASE
 // ============================================================
+function archiveCase(mod,id){
+  const c=DB[mod]?.find(x=>x.id===id);
+  if(!c)return;
+  if(!confirm('להעביר את תיק "'+c.name+'" לארכיון?\nהתיק יוסר מהאובריקה הנוכחית ויישמר בארכיון.'))return;
+  const now=new Date().toLocaleDateString('he-IL');
+  c.archivedFrom=mod;
+  c.archivedDate=now;
+  c.timeline=c.timeline||[];
+  c.timeline.push({t:'תיק הועבר לארכיון',d:now,c:'gray'});
+  DB[mod]=DB[mod].filter(x=>x.id!==id);
+  if(!DB.archive)DB.archive=[];
+  DB.archive.unshift(c);
+  selected[mod]=null;
+  const ca=document.getElementById('ca-'+mod);
+  if(ca)ca.innerHTML='<div class="empty-state"><div class="empty-icon">🗄</div><div>התיק הועבר לארכיון</div></div>';
+  render(mod);saveDB();renderDash();
+  const msg=document.createElement('div');
+  msg.style.cssText='position:fixed;bottom:20px;left:20px;background:#777;color:#fff;padding:10px 18px;border-radius:8px;font-size:13px;font-weight:600;font-family:Heebo,sans-serif;z-index:9999';
+  msg.textContent='🗄 התיק הועבר לארכיון';
+  document.body.appendChild(msg);setTimeout(()=>msg.remove(),3000);
+}
+
+function restoreFromArchive(id){
+  const c=DB.archive?.find(x=>x.id===id);
+  if(!c)return;
+  const origMod=c.archivedFrom||'reg';
+  if(!confirm('לשחזר את תיק "'+c.name+'" חזרה ל'+origMod+'?'))return;
+  const now=new Date().toLocaleDateString('he-IL');
+  c.timeline=c.timeline||[];
+  c.timeline.push({t:'תיק שוחזר מהארכיון',d:now,c:'green'});
+  delete c.archivedFrom;
+  delete c.archivedDate;
+  DB.archive=DB.archive.filter(x=>x.id!==id);
+  if(!DB[origMod])DB[origMod]=[];
+  DB[origMod].unshift(c);
+  selected['archive']=null;
+  document.getElementById('ca-archive').innerHTML='<div class="empty-state"><div class="empty-icon">🗄</div><div>תיקים שהסתיימו יופיעו כאן</div></div>';
+  render('archive');saveDB();renderDash();
+  switchModule(origMod);
+  setTimeout(()=>{render(origMod);selectCase(origMod,id);},100);
+}
+
 function executeModuleConvert(mod,id){
   const selectEl=document.getElementById('convert-select-'+id);
   if(!selectEl||!selectEl.value){alert('בחר אובריקה יעד');return;}
@@ -2117,6 +2307,15 @@ function deleteCase(mod,id){
   if(sel)sel.innerHTML='<div class="empty-state"><div class="empty-icon">'+
     {reg:'📋',tx:'🤝',poa:'📄',will:'📜',lit:'⚖️',notary:'🏛',other:'📁',leads:'🎯'}[mod]+
     '</div><div>בחר תיק מהרשימה או פתח חדש</div></div>';
+  if(mod==='archive'){
+    const origMod=c.archivedFrom||'reg';
+    const modLabels={reg:'📋 רישום',tx:'🤝 עסקה',poa:'📄 יפוי כוח',will:'📜 צוואה',lit:'🏛 ליטיגציה',notary:'✒️ נוטריון',other:'📁 אחר'};
+    const modColors={reg:'gold',tx:'amber',poa:'blue',will:'purple',lit:'red',notary:'green',other:'gray'};
+    stageName=c.archivedDate||c.created;
+    sub=c.address||c.subject||c.notes2||c.description||'';
+    progress=100;
+    pills=`<span class="pill ${modColors[origMod]||'gold'}">${modLabels[origMod]||origMod}</span><span class="pill gray">🗄 סגור</span>`;
+  }
   if(mod==='leads'){selectedLead=null;renderLeads();}
   else{selected[mod]=null;render(mod);}
   saveDB();renderDash();
@@ -2145,6 +2344,91 @@ function removeDeadline(mod,id,idx){
   c.deadlines.splice(idx,1);
   saveDB();renderContent(mod);
 }
+
+function toggleTxCheck(mod,id,stageIdx,itemIdx){
+  const c=DB[mod].find(x=>x.id===id);
+  if(!c)return;
+  if(!c.checkItems)c.checkItems={};
+  const key=stageIdx+'_'+itemIdx;
+  c.checkItems[key]=!c.checkItems[key];
+  saveDB();renderContent(mod);
+}
+
+function saveTxQuestion(mod,id,qi,val){
+  const c=DB[mod].find(x=>x.id===id);
+  if(!c)return;
+  if(!c.questionAnswers)c.questionAnswers={};
+  c.questionAnswers[qi]=val;
+  saveDB();
+}
+
+function saveDriveLink(mod,id){
+  const c=DB[mod].find(x=>x.id===id);
+  if(!c)return;
+  const url=document.getElementById('drive-url-'+id)?.value||'';
+  c.driveUrl=url;
+  if(url){
+    if(!c.timeline)c.timeline=[];
+    c.timeline.push({date:new Date().toISOString().split('T')[0],text:'קישור Google Drive נשמר'});
+  }
+  saveDB();renderContent(mod);
+  showToast('קישור Drive נשמר בהצלחה');
+}
+
+function checkReminders(){
+  const key='hason_reminders_'+new Date().toDateString();
+  if(sessionStorage.getItem(key))return;
+  const today=new Date();today.setHours(0,0,0,0);
+  const items=[];
+  const check=(mod,cases)=>{
+    (cases||[]).forEach(c=>{
+      (c.deadlines||[]).forEach(d=>{
+        const dd=new Date(d.date);dd.setHours(0,0,0,0);
+        const days=Math.round((dd-today)/(1000*60*60*24));
+        if(days>=0&&days<=3){
+          items.push({case:c.name||c.address||'תיק #'+c.id,type:d.type,note:d.note||'',date:d.date,days});
+        }
+      });
+    });
+  };
+  check('tx',DB.tx);
+  check('lit',DB.lit);
+  if(items.length>0){
+    sessionStorage.setItem(key,'shown');
+    showReminderPopup(items);
+  }
+}
+
+function showReminderPopup(items){
+  const el=document.createElement('div');
+  el.style.cssText='position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.6);z-index:9999;display:flex;align-items:center;justify-content:center;';
+  const getColor=(days)=>days===0?'#e53e3e':days===1?'#dd6b20':'#d97706';
+  const getLabel=(days)=>days===0?'היום!':days===1?'מחר':'בעוד '+days+' ימים';
+  el.innerHTML=`<div style="background:var(--surface,#1a1a2e);border:1px solid var(--border,#333);border-radius:14px;padding:24px;max-width:460px;width:90%;max-height:80vh;overflow-y:auto;direction:rtl">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
+      <div style="font-size:24px">⏰</div>
+      <div>
+        <div style="font-size:16px;font-weight:700;color:var(--text,#fff)">תזכורות קרובות</div>
+        <div style="font-size:12px;color:var(--text-dim,#888)">${items.length} מועדים ב-3 ימים הקרובים</div>
+      </div>
+    </div>
+    ${items.map(item=>`<div style="border:1px solid var(--border,#333);border-radius:8px;padding:10px 12px;margin-bottom:8px;border-right:3px solid ${getColor(item.days)}">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div>
+          <div style="font-size:13px;font-weight:600;color:var(--text,#fff)">${item.type}</div>
+          <div style="font-size:11px;color:var(--text-dim,#888);margin-top:2px">${item.case}${item.note?' · '+item.note:''}</div>
+        </div>
+        <div style="text-align:left">
+          <div style="font-size:13px;font-weight:700;color:${getColor(item.days)}">${getLabel(item.days)}</div>
+          <div style="font-size:11px;color:var(--text-dim,#888)">${new Date(item.date).toLocaleDateString('he-IL')}</div>
+        </div>
+      </div>
+    </div>`).join('')}
+    <button onclick="this.closest('div[style*=fixed]').remove()" style="width:100%;margin-top:8px;padding:10px;background:var(--gold,#B8860B);border:none;border-radius:8px;color:white;font-size:14px;font-weight:600;cursor:pointer">הבנתי, תודה</button>
+  </div>`;
+  document.body.appendChild(el);
+}
+
 
 function setLitProcedure(id,proc){
   const c=DB.lit.find(x=>x.id===id);
@@ -2235,6 +2519,7 @@ function loadDB() {
         if (!DB.leads) DB.leads = [];
       if (!DB.notary) DB.notary = [];
       if (!DB.other) DB.other = [];
+      if (!DB.archive) DB.archive = [];
       if (!DB.leads) DB.leads = [];
       if (!DB.reg) DB.reg = [];
       if (!DB.tx) DB.tx = [];
@@ -2271,6 +2556,7 @@ function loadDB() {
       if (!DB.leads) DB.leads = [];
       if (!DB.notary) DB.notary = [];
       if (!DB.other) DB.other = [];
+      if (!DB.archive) DB.archive = [];
       if (!DB.leads) DB.leads = [];
       if (!DB.reg) DB.reg = [];
       if (!DB.tx) DB.tx = [];
