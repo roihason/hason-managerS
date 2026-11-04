@@ -1134,7 +1134,7 @@ function renderContent(mod){
   // META
   let meta='';
   if(mod==='reg') meta=`<div class="mi"><div class="ml">טלפון</div><div class="mv">${c.phone}</div></div><div class="mi"><div class="ml">עו"ד נגדי</div><div class="mv">${c.opposing||'—'}</div></div><div class="mi"><div class="ml">גוש/חלקה</div><div class="mv gold">${c.gush}/${c.helka}</div></div><div class="mi"><div class="ml">שכ"ט</div><div class="mv gold">₪${Number(c.fee).toLocaleString()}</div></div>`;
-  if(mod==='tx'){const priceLabel=c.type==='rent'?'שכר דירה':'מחיר עסקה';meta=`<div class="mi"><div class="ml">טלפון</div><div class="mv">${c.phone}</div></div><div class="mi"><div class="ml">עו"ד נגדי</div><div class="mv">${c.opposing||'—'}</div></div><div class="mi"><div class="ml">${priceLabel}</div><div class="mv gold">₪${Number(c.price).toLocaleString()}</div></div><div class="mi"><div class="ml">מועד סיום</div><div class="mv amber">${c.deadline?new Date(c.deadline).toLocaleDateString('he-IL'):'—'}</div></div>${c.driveUrl?`<div class="mi" style="cursor:pointer" onclick="window.open('${c.driveUrl}','_blank')"><div class="ml">Google Drive</div><div class="mv" style="color:var(--gold)">📂 פתח תיק</div></div>`:''}\`;}
+  if(mod==='tx'){const priceLabel=c.type==='rent'?'שכר דירה':'מחיר עסקה';meta=`<div class="mi"><div class="ml">טלפון</div><div class="mv">${c.phone}</div></div><div class="mi"><div class="ml">עו"ד נגדי</div><div class="mv">${c.opposing||'—'}</div></div><div class="mi"><div class="ml">${priceLabel}</div><div class="mv gold">₪${Number(c.price).toLocaleString()}</div></div><div class="mi"><div class="ml">מועד סיום</div><div class="mv amber">${c.deadline?new Date(c.deadline).toLocaleDateString('he-IL'):'—'}</div></div>${c.driveUrl?`<div class="mi" style="cursor:pointer" onclick="window.open('${c.driveUrl}','_blank')"><div class="ml">Google Drive</div><div class="mv" style="color:var(--gold)">📂 פתח תיק</div></div>`:''}`;}
   if(mod==='poa') meta=`<div class="mi"><div class="ml">טלפון</div><div class="mv">${c.phone}</div></div><div class="mi"><div class="ml">ממונה ראשי</div><div class="mv gold">${c.attorneys[0]?.name||'—'}</div></div><div class="mi"><div class="ml">הפקדה</div><div class="mv ${c.filingRef?'teal':''}">${c.filingRef||'טרם הופקד'}</div></div><div class="mi"><div class="ml">שכ"ט</div><div class="mv gold">₪${Number(c.fee).toLocaleString()}</div></div>`;
   if(mod==='will') meta=`<div class="mi"><div class="ml">טלפון</div><div class="mv">${c.phone}</div></div><div class="mi"><div class="ml">יורשים</div><div class="mv gold">${c.heirs.length} יורשים</div></div><div class="mi"><div class="ml">מנהל עיזבון</div><div class="mv">${c.executor||'—'}</div></div><div class="mi"><div class="ml">הפקדה</div><div class="mv ${c.filingRef?'purple':''}">${c.filingRef||'טרם הופקדה'}</div></div>`;
   if(mod==='lit'){const nh=c.hearings.filter(h=>!h.past).sort((a,b)=>new Date(a.date)-new Date(b.date))[0];const procLabel=LIT_PROCEDURES[c.procedure]?LIT_PROCEDURES[c.procedure].label:'לא הוגדר';meta=`<div class="mi"><div class="ml">ביהמ"ש</div><div class="mv">${c.court}</div></div><div class="mi"><div class="ml">מס' תיק</div><div class="mv">${c.caseNum||'—'}</div></div><div class="mi"><div class="ml">מסגרת דיונית</div><div class="mv gold">${procLabel}</div></div><div class="mi"><div class="ml">דיון הבא</div><div class="mv amber">${nh?new Date(nh.date).toLocaleDateString('he-IL'):'אין'}</div></div><div class="mi"><div class="ml">סכום תביעה</div><div class="mv gold">₪${Number(c.claim).toLocaleString()}</div></div>`;}
@@ -2463,6 +2463,7 @@ function autoAddDeadlines(id){
 // ============================================================
 const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzM3Ha6VihLumLXMtRUzyDKPlAJzfz2ZBWCVUuOSLJb6la78N_rcjgFzxA3UiKgAC0x9Q/exec';
 let isSaving = false;
+let dbLoaded = false; // לא שומרים לשרת לפני טעינה מוצלחת — מונע דריסת נתונים
 let saveTimer = null;
 
 function showSaveStatus(msg, color) {
@@ -2486,6 +2487,11 @@ function saveDB() {
   // Debounce — שמור רק אחרי שנייה של שקט
   clearTimeout(saveTimer);
   saveTimer = setTimeout(() => {
+    try { localStorage.setItem('hason_law_backup', JSON.stringify(DB)); } catch(e) {}
+    if (!dbLoaded) {
+      showSaveStatus('⚠️ הנתונים לא נטענו מהשרת — נשמר מקומית בלבד (רענן את הדף)', 'red');
+      return;
+    }
     showSaveStatus('💾 שומר...', 'saving');
     fetch(SCRIPT_URL + '?action=save', {
       method: 'POST',
@@ -2507,10 +2513,11 @@ function saveDB() {
 function loadDB() {
   showSaveStatus('⏳ טוען נתונים...', 'saving');
   fetch(SCRIPT_URL + '?action=load')
-    .then(r => r.json())
+    .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
     .then(parsed => {
+      if (!parsed || typeof parsed !== 'object' || parsed.status === 'error') throw new Error('bad payload');
       if (parsed && typeof parsed === 'object') {
-        ['reg','tx','poa','will','lit','leads'].forEach(mod => {
+        ['reg','tx','poa','will','lit','leads','notary','other','archive'].forEach(mod => {
           if (parsed[mod] && Array.isArray(parsed[mod])) {
             DB[mod] = parsed[mod];
           }
@@ -2528,6 +2535,7 @@ function loadDB() {
       if (!DB.lit) DB.lit = [];
       DB.lit.forEach(c=>{if(!c.procedure)c.procedure='';if(!c.deadlines)c.deadlines=[];});
       }
+      dbLoaded = true;
       showSaveStatus('✓ נתונים נטענו', 'green');
       // Re-render after load
       renderDash();
@@ -2542,15 +2550,15 @@ function loadDB() {
         const backup = localStorage.getItem('hason_law_backup');
         if (backup) {
           const parsed = JSON.parse(backup);
-          ['reg','tx','poa','will','lit','leads'].forEach(mod => {
+          ['reg','tx','poa','will','lit','leads','notary','other','archive'].forEach(mod => {
             if (parsed[mod] && Array.isArray(parsed[mod])) DB[mod] = parsed[mod];
           });
-          showSaveStatus('⚠️ נטען מגיבוי מקומי', 'gold');
+          showSaveStatus('⚠️ החיבור לשרת נכשל — מוצג גיבוי מקומי, שינויים לא יישמרו לשרת', 'red');
         } else {
-          showSaveStatus('✓ מוכן', 'green');
+          showSaveStatus('⚠️ החיבור לשרת נכשל — רענן את הדף', 'red');
         }
       } catch(e) {
-        showSaveStatus('✓ מוכן', 'green');
+        showSaveStatus('⚠️ החיבור לשרת נכשל — רענן את הדף', 'red');
       }
       DB.reg.forEach(c => { if (!c.subtype) c.subtype = 'tabu'; });
       if (!DB.leads) DB.leads = [];
